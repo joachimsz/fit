@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelp — Train Harder. Live Better.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════
+   TOKENS — dark only
+══════════════════════════════ */
+:root {
+  --green:   #39FF14;
+  --cyan:    #00E5FF;
+  --pink:    #FF2D78;
+  --yellow:  #FFD60A;
+  --orange:  #FF6B35;
+  --purple:  #BF5AF2;
+
+  --bg:      #080808;
+  --bg2:     #0f0f0f;
+  --bg3:     #1c1c1e;
+  --card:    #131313;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #f5f5f7;
+  --text2:   #a1a1a6;
+  --text3:   #6e6e73;
+  --glass:   rgba(8,8,8,0.86);
+  --shadow:  0 12px 60px rgba(0,0,0,0.7);
+
+  --header-h: 96px;
+  --radius: 18px;
+  --ease: cubic-bezier(.4,0,.2,1);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+[dir="rtl"] { text-align:right; }
+
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:3px; }
+
+/* ════════════════════════════════════════
+   HEADER  — 96px | hamburger-left | logo-center
+════════════════════════════════════════ */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 800;
+  height: var(--header-h);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 36px;
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  background: var(--glass);
+  border-bottom: 1px solid var(--border);
+  transition: border-color .4s var(--ease);
+}
+header.scrolled { border-bottom-color: rgba(255,255,255,.1); }
+
+/* --- Left zone --- */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- Center logo --- */
+.header-center { display:flex; justify-content:center; }
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.85rem;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity .2s;
+}
+.logo:hover { opacity: .75; }
+
+/* --- Right zone --- */
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --- Hamburger button --- */
+.menu-toggle {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background .25s var(--ease);
+  flex-shrink: 0;
+}
+.menu-toggle:hover { background: #252527; }
+.menu-toggle .bar {
+  display: block;
+  width: 18px;
+  height: 1.8px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform .4s var(--ease), opacity .3s, width .35s var(--ease);
+  transform-origin: center;
+}
+.menu-toggle.open .bar:nth-child(1) { transform: translateY(6.8px) rotate(45deg); }
+.menu-toggle.open .bar:nth-child(2) { opacity: 0; width: 6px; }
+.menu-toggle.open .bar:nth-child(3) { transform: translateY(-6.8px) rotate(-45deg); }
+
+.btn-login {
+  padding: 9px 22px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .25s var(--ease);
+}
+.btn-login:hover { background: var(--bg3); }
+
+.btn-start {
+  padding: 9px 22px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  border: none;
+  color: #000;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s, transform .2s var(--spring);
+  white-space: nowrap;
+}
+.btn-start:hover { opacity: .88; transform: scale(1.04); }
+
+/* ════════════════════════════════════════
+   DRAWER NAV
+════════════════════════════════════════ */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background .5s var(--ease);
+}
+.drawer-overlay.open {
+  background: rgba(0,0,0,.55);
+  pointer-events: all;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 860;
+  width: min(380px, 88vw);
+  background: #0d0d0d;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transform: translateX(-100%);
+  transition: transform .55s cubic-bezier(.77,0,.175,1);
+  overflow: hidden;
+}
+.drawer.open { transform: translateX(0); }
+
+/* Drawer top bar */
+.drawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.drawer-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.drawer-close {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  transition: background .2s, color .2s;
+}
+.drawer-close:hover { background: #333; color: var(--text); }
+
+/* Drawer nav links */
+.drawer-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 28px;
+  gap: 4px;
+  overflow-y: auto;
+}
+.drawer-nav a {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text2);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 14px;
+  transition: color .25s, background .25s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  letter-spacing: -.4px;
+  /* stagger handled via JS class */
+  transform: translateX(-20px);
+  opacity: 0;
+  transition: color .25s var(--ease), background .25s var(--ease),
+              transform .5s var(--ease), opacity .5s var(--ease);
+}
+.drawer.open .drawer-nav a {
+  transform: translateX(0);
+  opacity: 1;
+}
+.drawer.open .drawer-nav a:nth-child(1) { transition-delay: .08s; }
+.drawer.open .drawer-nav a:nth-child(2) { transition-delay: .12s; }
+.drawer.open .drawer-nav a:nth-child(3) { transition-delay: .16s; }
+.drawer.open .drawer-nav a:nth-child(4) { transition-delay: .20s; }
+.drawer.open .drawer-nav a:nth-child(5) { transition-delay: .24s; }
+.drawer-nav a:hover,
+.drawer-nav a.active { color: var(--text); background: rgba(255,255,255,.05); }
+.drawer-nav a.active { color: var(--green); }
+.nav-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+/* Drawer language section */
+.drawer-lang-sep {
+  margin: 0 28px;
+  height: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.drawer-lang {
+  padding: 24px 28px;
+  flex-shrink: 0;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform .5s .3s var(--ease), opacity .5s .3s var(--ease);
+}
+.drawer.open .drawer-lang {
+  transform: translateY(0);
+  opacity: 1;
+}
+.drawer-lang-label {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.lang-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--bg3);
+  border: 1px solid transparent;
+  transition: background .2s, border-color .2s;
+}
+.lang-pill:hover { background: #252527; }
+.lang-pill.selected { border-color: var(--green); background: rgba(57,255,20,.08); }
+.lang-pill .lf { font-size: 1.2rem; line-height: 1; }
+.lang-pill .lc { font-size: .6rem; font-weight: 700; color: var(--text3); letter-spacing: .04em; }
+.lang-pill.selected .lc { color: var(--green); }
+
+/* ════════════════════════════════════════
+   PAGE SYSTEM
+════════════════════════════════════════ */
+.page {
+  display: none;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+}
+.page.active { display: block; }
+
+/* Page transition */
+.page-enter {
+  animation: pageIn .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes pageIn {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ════════════════════════════════════════
+   HERO
+════════════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 80px 24px 80px;
+}
+
+/* Noise texture overlay */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: .028;
+  pointer-events: none;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  will-change: transform;
+  background:
+    radial-gradient(ellipse 80% 65% at 20% 45%, rgba(57,255,20,.13)  0%, transparent 60%),
+    radial-gradient(ellipse 60% 55% at 82% 55%, rgba(0,229,255,.10)  0%, transparent 55%),
+    radial-gradient(ellipse 50% 55% at 50% 102%,rgba(255,45,120,.09) 0%, transparent 60%);
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  will-change: transform;
+}
+.hero-orb-1 {
+  width: 460px; height: 460px;
+  top: -80px; left: -100px;
+  background: radial-gradient(circle, rgba(57,255,20,.18), transparent 65%);
+  animation: orbFloat1 9s ease-in-out infinite;
+}
+.hero-orb-2 {
+  width: 380px; height: 380px;
+  bottom: 0; right: -60px;
+  background: radial-gradient(circle, rgba(0,229,255,.14), transparent 65%);
+  animation: orbFloat2 11s ease-in-out infinite;
+}
+.hero-orb-3 {
+  width: 300px; height: 300px;
+  bottom: 30%; left: 60%;
+  background: radial-gradient(circle, rgba(255,45,120,.10), transparent 65%);
+  animation: orbFloat3 13s ease-in-out infinite;
+}
+@keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,25px) scale(1.05)} }
+@keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-25px,-30px) scale(1.08)} }
+@keyframes orbFloat3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,-20px) scale(.95)} }
+
+.hero-rings {
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 520px; height: 520px;
+  z-index: 2;
+  opacity: .5;
+  animation: ringsFloat 7s ease-in-out infinite;
+}
+@keyframes ringsFloat {
+  0%,100%{ transform:translateY(-50%) rotate(0deg); }
+  50%    { transform:translateY(calc(-50% - 22px)) rotate(4deg); }
+}
+
+.hero-tag {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(57,255,20,.1);
+  border: 1px solid rgba(57,255,20,.2);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeUp .7s .1s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 1.03;
+  letter-spacing: -3px;
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+}
+/* Word-by-word reveal wrapper */
+.hero-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: heroWord .8s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes heroWord {
+  to { opacity:1; transform:none; }
+}
+
+.hero h1 .grad1 {
+  background: linear-gradient(160deg, #fff 0%, var(--text2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero h1 .grad2 {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--text2);
+  max-width: 560px;
+  margin: 24px auto 44px;
+  position: relative;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: heroFadeUp .7s .55s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: heroFadeUp .7s .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+@keyframes heroFadeUp {
+  to { opacity:1; transform:none; }
+}
+
+.btn-primary {
+  padding: 15px 36px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  border: none;
+  color: #000;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .25s var(--spring), box-shadow .25s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.2), transparent);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.btn-primary:hover { transform: scale(1.06); box-shadow: 0 0 36px rgba(57,255,20,.4); }
+.btn-primary:hover::after { opacity: 1; }
+
+.btn-secondary {
+  padding: 15px 36px;
+  border-radius: 26px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .25s, transform .25s var(--spring);
+}
+.btn-secondary:hover { background: #252527; transform: scale(1.03); }
+
+/* Stat counter numbers */
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  margin-top: 72px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp .7s .85s cubic-bezier(.22,1,.36,1) forwards;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: .72rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+/* Scroll indicator */
+.scroll-cue {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  animation: heroFadeUp .7s 1.2s cubic-bezier(.22,1,.36,1) forwards;
+}
+.scroll-cue span { font-size: .68rem; color: var(--text3); letter-spacing: .12em; text-transform: uppercase; }
+.scroll-line {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, var(--text3), transparent);
+  animation: scrollPulse 2s 1.8s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%,100%{ transform:scaleY(1); opacity:.5; }
+  50%    { transform:scaleY(1.3); opacity:1; }
+}
+
+/* ════════════════════════════════════════
+   SECTIONS
+════════════════════════════════════════ */
+.section {
+  padding: 110px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-tag {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px;
+}
+.section-sub {
+  color: var(--text2);
+  font-size: 1.05rem;
+  max-width: 540px;
+  margin-bottom: 64px;
+  line-height: 1.7;
+}
+
+/* ════════════════════════════════════════
+   FEATURE GRID
+════════════════════════════════════════ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.feat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 34px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+/* Ambient light sweep on hover */
+.feat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.05), transparent 60%);
+  opacity: 0;
+  transition: opacity .35s;
+}
+.feat-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.feat-card:hover::before { opacity: 1; }
+
+/* Top gradient line */
+.feat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-a, transparent), var(--accent-b, transparent));
+  border-radius: var(--radius) var(--radius) 0 0;
+  opacity: 0;
+  transition: opacity .35s;
+}
+.feat-card:hover::after { opacity: 1; }
+
+.feat-icon {
+  width: 54px; height: 54px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 22px;
+}
+.feat-card h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1.2rem; margin-bottom:10px; }
+.feat-card p  { color:var(--text2); font-size:.9rem; line-height:1.68; }
+.feat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: gap .25s var(--ease);
+}
+.feat-link:hover { gap: 11px; }
+
+/* ════════════════════════════════════════
+   STRIPS
+════════════════════════════════════════ */
+.strip { padding: 90px 0; overflow: hidden; }
+.strip-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+.strip-inner.reverse { direction: rtl; }
+.strip-inner.reverse > * { direction: ltr; }
+.strip-visual {
+  border-radius: 30px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .6s var(--ease), box-shadow .6s var(--ease);
+}
+.strip-visual:hover { transform: scale(1.02); box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.strip-text .section-tag { display: block; }
+.strip-text .section-title { font-size: clamp(1.8rem,3.5vw,2.8rem); }
+.strip-text p { color:var(--text2); margin-bottom:28px; line-height:1.75; }
+
+/* Strip slide animations */
+.strip-slide-left  { opacity:0; transform:translateX(-50px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.strip-slide-right { opacity:0; transform:translateX(50px);  transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.strip-slide-left.visible,
+.strip-slide-right.visible { opacity:1; transform:none; }
+
+/* ════════════════════════════════════════
+   SUBSCRIPTIONS
+════════════════════════════════════════ */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+.plan-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  padding: 38px 34px;
+  position: relative;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+  overflow: hidden;
+}
+.plan-card::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 0%, var(--plan-glow, transparent) 0%, transparent 60%);
+  opacity:.6;
+}
+.plan-card.featured {
+  border-color: var(--green);
+  --plan-glow: rgba(57,255,20,.1);
+  box-shadow: 0 0 70px rgba(57,255,20,.08);
+}
+.plan-card:hover { transform: translateY(-7px); box-shadow: var(--shadow); }
+.plan-badge {
+  position: absolute; top: 20px; right: 20px;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000; font-size: .7rem; font-weight: 700;
+  padding: 4px 11px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.plan-name  { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; margin-bottom:4px; }
+.plan-sub   { color:var(--text3); font-size:.85rem; margin-bottom:28px; }
+.plan-price { font-family:'Syne',sans-serif; font-weight:800; font-size:3.2rem; letter-spacing:-2px; line-height:1; margin-bottom:4px; }
+.plan-price span { font-size:1rem; font-weight:400; color:var(--text2); }
+.plan-period { color:var(--text3); font-size:.8rem; margin-bottom:28px; }
+.plan-divider { height:1px; background:var(--border); margin-bottom:24px; }
+.plan-features { list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:32px; }
+.plan-features li { display:flex; align-items:flex-start; gap:10px; font-size:.9rem; color:var(--text2); }
+.plan-features li.yes::before {
+  content:'✓';
+  display:flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%; flex-shrink:0;
+  background:rgba(57,255,20,.15); color:var(--green);
+  font-size:.7rem; font-weight:700; margin-top:2px;
+}
+.plan-btn {
+  width:100%; padding:14px; border-radius:22px; border:none;
+  font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:600;
+  cursor:pointer; transition: transform .25s var(--spring), opacity .2s;
+}
+.plan-btn.primary { background:linear-gradient(135deg,var(--green),var(--cyan)); color:#000; }
+.plan-btn.primary:hover { transform:scale(1.03); opacity:.9; }
+.plan-btn.outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+.plan-btn.outline:hover { background:var(--bg3); }
+
+/* ════════════════════════════════════════
+   TEAM
+════════════════════════════════════════ */
+.team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:22px; margin-top:48px; }
+.team-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:26px; padding:30px 24px;
+  text-align:center;
+  transition:transform .4s var(--ease), box-shadow .4s var(--ease);
+  position:relative; overflow:hidden;
+}
+.team-card:hover { transform:translateY(-6px); box-shadow:var(--shadow); }
+.team-avatar {
+  width:90px; height:90px; border-radius:50%;
+  margin:0 auto 18px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem; position:relative;
+}
+.team-avatar::after {
+  content:''; position:absolute; inset:-3px;
+  border-radius:50%; border:2px solid transparent;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+             linear-gradient(135deg,var(--grad-a,#fff),var(--grad-b,#aaa)) border-box;
+}
+.team-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; margin-bottom:4px; }
+.team-role { font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+.team-bio  { font-size:.85rem; color:var(--text2); line-height:1.6; }
+.team-tags { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+.tag { font-size:.7rem; font-weight:600; padding:3px 10px; border-radius:20px; background:var(--bg3); color:var(--text2); }
+
+/* ════════════════════════════════════════
+   ABOUT
+════════════════════════════════════════ */
+.about-hero { padding:90px 24px 50px; max-width:900px; margin:0 auto; text-align:center; }
+.about-hero h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2.2rem,5vw,4rem); letter-spacing:-1.5px; margin-bottom:20px; }
+.about-hero p { font-size:1.1rem; color:var(--text2); max-width:640px; margin:0 auto; }
+.about-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:64px; }
+.about-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:38px; }
+.about-card h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1.2rem; margin-bottom:12px; }
+.about-card p { color:var(--text2); line-height:1.72; }
+.about-values { display:flex; flex-direction:column; gap:18px; margin-top:24px; }
+.value-item { display:flex; gap:14px; align-items:flex-start; }
+.value-dot { width:8px; height:8px; border-radius:50%; margin-top:9px; flex-shrink:0; }
+.value-item h4 { font-weight:600; margin-bottom:4px; }
+.value-item p { font-size:.9rem; color:var(--text2); }
+
+/* ════════════════════════════════════════
+   CONTACT
+════════════════════════════════════════ */
+.contact-wrap { max-width:680px; margin:0 auto; padding:90px 24px; }
+.contact-wrap h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,4vw,3rem); letter-spacing:-1px; margin-bottom:12px; }
+.contact-wrap > p { color:var(--text2); margin-bottom:48px; }
+.contact-form { display:flex; flex-direction:column; gap:16px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:8px; }
+.form-group label { font-size:.85rem; font-weight:500; color:var(--text2); }
+.form-group input, .form-group textarea, .form-group select {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:13px; padding:13px 16px;
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:.95rem;
+  outline:none; transition:border-color .25s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--green); }
+.form-group textarea { resize:vertical; min-height:130px; }
+.contact-info { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:48px; }
+.info-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px; text-align:center; }
+.info-icon { font-size:1.4rem; margin-bottom:10px; }
+.info-card h4 { font-weight:600; font-size:.9rem; margin-bottom:4px; }
+.info-card p { font-size:.8rem; color:var(--text2); }
+
+/* ════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════ */
+footer { background:var(--bg2); border-top:1px solid var(--border); padding:64px 24px 32px; }
+.footer-inner { max-width:1200px; margin:0 auto; }
+.footer-top { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+.footer-brand p { color:var(--text2); font-size:.9rem; margin-top:12px; max-width:280px; line-height:1.65; }
+.footer-col h5 { font-weight:700; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin-bottom:18px; }
+.footer-col a { display:block; color:var(--text2); font-size:.875rem; text-decoration:none; margin-bottom:10px; cursor:pointer; transition:color .2s; }
+.footer-col a:hover { color:var(--text); }
+.footer-bottom { border-top:1px solid var(--border); padding-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+.footer-bottom p { font-size:.8rem; color:var(--text3); }
+.footer-socials { display:flex; gap:10px; }
+.social-btn {
+  width:35px; height:35px; border-radius:50%;
+  background:var(--bg3); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.88rem; cursor:pointer; transition:background .25s, color .25s, transform .25s var(--spring);
+  color:var(--text2); text-decoration:none;
+}
+.social-btn:hover { background:var(--green); color:#000; transform:scale(1.12); }
+
+/* ════════════════════════════════════════
+   MISC & HELPERS
+════════════════════════════════════════ */
+.features-showcase { background:var(--bg2); }
+.divider { height:1px; background:var(--border); max-width:1200px; margin:0 auto; }
+.text-green  { color:var(--green); }
+.text-cyan   { color:var(--cyan); }
+.text-pink   { color:var(--pink); }
+.text-yellow { color:var(--yellow); }
+.text-orange { color:var(--orange); }
+.text-purple { color:var(--purple); }
+.g-green  { background:linear-gradient(135deg,var(--green),var(--cyan));  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.g-pink   { background:linear-gradient(135deg,var(--pink),var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.g-purple { background:linear-gradient(135deg,var(--purple),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.g-yellow { background:linear-gradient(135deg,var(--yellow),var(--orange));-webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+/* App mockup */
+.mockup-phone { position:relative; width:240px; height:460px; margin:0 auto; }
+.mockup-screen {
+  position:absolute; inset:0;
+  background:var(--bg2); border-radius:36px;
+  border:2px solid var(--border); overflow:hidden; padding:20px 16px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.mock-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; font-size:.7rem; color:var(--text2); }
+.mock-title  { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:14px; }
+.mock-card   { background:var(--bg3); border-radius:14px; padding:12px; margin-bottom:8px; display:flex; gap:10px; align-items:center; }
+.mock-dot    { width:10px; height:10px; border-radius:50%; }
+.mock-label  { font-size:.65rem; font-weight:600; }
+.mock-val    { font-size:.75rem; font-weight:700; margin-top:1px; }
+
+/* ════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity .75s var(--ease), transform .75s var(--ease);
+}
+.reveal.visible { opacity:1; transform:none; }
+.reveal-delay-1 { transition-delay:.1s; }
+.reveal-delay-2 { transition-delay:.2s; }
+.reveal-delay-3 { transition-delay:.3s; }
+.reveal-delay-4 { transition-delay:.4s; }
+/* Scale-in variant for cards */
+.reveal-scale {
+  opacity:0;
+  transform:scale(.94) translateY(24px);
+  transition:opacity .65s var(--ease), transform .65s var(--ease);
+}
+.reveal-scale.visible { opacity:1; transform:none; }
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media(max-width:900px) {
+  header { padding:0 20px; }
+  .strip-inner { grid-template-columns:1fr; gap:40px; }
+  .strip-inner.reverse { direction:ltr; }
+  .about-grid { grid-template-columns:1fr; }
+  .footer-top { grid-template-columns:1fr 1fr; }
+  .form-row { grid-template-columns:1fr; }
+  .contact-info { grid-template-columns:1fr; }
+}
+@media(max-width:600px) {
+  .hero-rings { display:none; }
+  .plans-grid { grid-template-columns:1fr; }
+  .footer-top { grid-template-columns:1fr; }
+  .btn-login { display:none; }
+  header { padding:0 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header id="siteHeader">
+
+  <!-- LEFT: hamburger -->
+  <div class="header-left">
+    <button class="menu-toggle" id="menuToggle" onclick="toggleDrawer()" aria-label="Open menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+
+  <!-- CENTER: logo -->
+  <div class="header-center">
+    <div class="logo" onclick="navigate('home')">Kelp</div>
+  </div>
+
+  <!-- RIGHT: action buttons -->
+  <div class="header-right">
+    <button class="btn-login"  data-i18n="btn_login">Log In</button>
+    <button class="btn-start"  data-i18n="btn_start">Start Now</button>
+  </div>
+
+</header>
+
+<!-- ══════════════════ DRAWER OVERLAY ══════════════════ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- ══════════════════ DRAWER ══════════════════ -->
+<div class="drawer" id="drawer">
+
+  <!-- Drawer top bar -->
+  <div class="drawer-top">
+    <div class="drawer-logo">Kelp</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+
+  <!-- Nav links -->
+  <nav class="drawer-nav" id="drawerNav">
+    <a onclick="navigate('home');closeDrawer()" data-page="home">
+      <span class="nav-icon" style="background:rgba(57,255,20,.1);">🏠</span>
+      <span data-i18n="nav_home">Home</span>
+    </a>
+    <a onclick="navigate('about');closeDrawer()" data-page="about">
+      <span class="nav-icon" style="background:rgba(0,229,255,.1);">🌊</span>
+      <span data-i18n="nav_about">About</span>
+    </a>
+    <a onclick="navigate('team');closeDrawer()" data-page="team">
+      <span class="nav-icon" style="background:rgba(255,45,120,.1);">👥</span>
+      <span data-i18n="nav_team">Team</span>
+    </a>
+    <a onclick="navigate('subscriptions');closeDrawer()" data-page="subscriptions">
+      <span class="nav-icon" style="background:rgba(191,90,242,.1);">💎</span>
+      <span data-i18n="nav_plans">Plans</span>
+    </a>
+    <a onclick="navigate('contact');closeDrawer()" data-page="contact">
+      <span class="nav-icon" style="background:rgba(255,214,10,.1);">✉️</span>
+      <span data-i18n="nav_contact">Contact</span>
+    </a>
+  </nav>
+
+  <!-- Language separator + picker at bottom -->
+  <div class="drawer-lang-sep"></div>
+  <div class="drawer-lang">
+    <div class="drawer-lang-label" data-i18n="lang_label">Language</div>
+    <div class="lang-grid" id="langGrid">
+      <div class="lang-pill" onclick="setLang('en')"><span class="lf">🇬🇧</span><span class="lc">EN</span></div>
+      <div class="lang-pill" onclick="setLang('fr')"><span class="lf">🇫🇷</span><span class="lc">FR</span></div>
+      <div class="lang-pill" onclick="setLang('es')"><span class="lf">🇪🇸</span><span class="lc">ES</span></div>
+      <div class="lang-pill" onclick="setLang('it')"><span class="lf">🇮🇹</span><span class="lc">IT</span></div>
+      <div class="lang-pill" onclick="setLang('de')"><span class="lf">🇩🇪</span><span class="lc">DE</span></div>
+      <div class="lang-pill" onclick="setLang('pl')"><span class="lf">🇵🇱</span><span class="lc">PL</span></div>
+      <div class="lang-pill" onclick="setLang('pt')"><span class="lf">🇧🇷</span><span class="lc">PT</span></div>
+      <div class="lang-pill" onclick="setLang('ar')"><span class="lf">🇸🇦</span><span class="lc">AR</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════ HOME PAGE ══════════════════ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+
+    <!-- Animated rings -->
+    <div class="hero-rings">
+      <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <circle cx="250" cy="250" r="210" fill="none" stroke="rgba(255,45,120,.12)" stroke-width="38"/>
+        <path fill="none" stroke="#FF2D78" stroke-width="38" stroke-linecap="round" filter="url(#glow)" d="M250,40 A210,210 0 1,1 249,40"/>
+        <circle cx="250" cy="250" r="160" fill="none" stroke="rgba(57,255,20,.10)" stroke-width="36"/>
+        <path fill="none" stroke="#39FF14" stroke-width="36" stroke-linecap="round" filter="url(#glow)" d="M250,90 A160,160 0 1,1 249.5,90"/>
+        <circle cx="250" cy="250" r="110" fill="none" stroke="rgba(0,229,255,.10)" stroke-width="34"/>
+        <path fill="none" stroke="#00E5FF" stroke-width="34" stroke-linecap="round" filter="url(#glow)" d="M250,140 A110,110 0 0,1 360,250"/>
+        <circle cx="250" cy="40"  r="18" fill="#FF2D78" opacity=".9"/><text x="250" y="46"  text-anchor="middle" fill="white" font-size="16">↑</text>
+        <circle cx="250" cy="90"  r="16" fill="#39FF14" opacity=".9"/><text x="250" y="96"  text-anchor="middle" fill="black" font-size="14">↑</text>
+        <circle cx="360" cy="250" r="15" fill="#00E5FF" opacity=".9"/><text x="360" y="256" text-anchor="middle" fill="black" font-size="14">↑</text>
+      </svg>
+    </div>
+
+    <div class="hero-tag" data-i18n="hero_tag">🏆 #1 Fitness App 2025</div>
+    <h1 id="heroTitle">
+      <span class="grad1"><span class="hero-word" style="animation-delay:.25s" data-i18n="hero_h1a">Train smarter.</span></span><br>
+      <span class="grad2"><span class="hero-word" style="animation-delay:.42s" data-i18n="hero_h1b">Live stronger.</span></span>
+    </h1>
+    <p data-i18n="hero_p">Kelp transforms your fitness journey with AI-powered workouts, real-time progress tracking, and a community that pushes you further every day.</p>
+    <div class="hero-cta">
+      <button class="btn-primary"   onclick="navigate('subscriptions')" data-i18n="hero_cta1">Get Started Free</button>
+      <button class="btn-secondary" onclick="navigate('about')"         data-i18n="hero_cta2">Learn More</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" data-counter="500" data-suffix="K+">0</div><div class="stat-label" data-i18n="stat1">Active Users</div></div>
+      <div class="stat"><div class="stat-num" data-counter="2"   data-suffix="M+">0</div><div class="stat-label" data-i18n="stat2">Workouts Done</div></div>
+      <div class="stat"><div class="stat-num" data-counter="4.9" data-suffix="★" data-decimals="1">0</div><div class="stat-label" data-i18n="stat3">App Rating</div></div>
+      <div class="stat"><div class="stat-num" data-counter="150" data-suffix="+">0</div><div class="stat-label" data-i18n="stat4">Expert Trainers</div></div>
+    </div>
+    <div class="scroll-cue">
+      <span data-i18n="scroll_down">Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- FEATURE CARDS -->
+  <section class="section features-showcase" style="max-width:100%;padding:100px 0;">
+    <div class="section" style="padding-top:0;padding-bottom:0;">
+      <div class="section-tag text-green reveal" data-i18n="feat_tag">Why Kelp</div>
+      <h2 class="section-title reveal reveal-delay-1" data-i18n="feat_title">Everything you need<br>to reach your peak.</h2>
+      <p class="section-sub reveal reveal-delay-2" data-i18n="feat_sub">Built for athletes, beginners, and everyone in between — Kelp has the tools to level you up.</p>
+      <div class="features-grid">
+        <div class="feat-card reveal-scale" style="--accent-a:var(--pink);--accent-b:var(--orange);">
+          <div class="feat-icon" style="background:rgba(255,45,120,.13);">💪</div>
+          <h3 data-i18n="f1_title">Build Strength</h3>
+          <p data-i18n="f1_desc">Progressive overload programs designed by elite coaches. Lift heavier, recover smarter, grow consistently.</p>
+          <span class="feat-link text-pink" onclick="navigate('team')" data-i18n="f1_link">Meet our coaches →</span>
+        </div>
+        <div class="feat-card reveal-scale reveal-delay-1" style="--accent-a:var(--cyan);--accent-b:var(--green);">
+          <div class="feat-icon" style="background:rgba(0,229,255,.13);">🏃</div>
+          <h3 data-i18n="f2_title">Boost Endurance</h3>
+          <p data-i18n="f2_desc">Cardio & HIIT plans that push your limits week by week. Track your VO2 max and watch it climb.</p>
+          <span class="feat-link text-cyan" onclick="navigate('subscriptions')" data-i18n="f2_link">See plans →</span>
+        </div>
+        <div class="feat-card reveal-scale reveal-delay-2" style="--accent-a:var(--green);--accent-b:var(--cyan);">
+          <div class="feat-icon" style="background:rgba(57,255,20,.13);">🔥</div>
+          <h3 data-i18n="f3_title">Sculpt Your Body</h3>
+          <p data-i18n="f3_desc">Body recomposition programs combining weight training, cardio, and nutrition guidance for visible results.</p>
+          <span class="feat-link text-green" onclick="navigate('subscriptions')" data-i18n="f3_link">Start sculpting →</span>
+        </div>
+        <div class="feat-card reveal-scale reveal-delay-3" style="--accent-a:var(--yellow);--accent-b:var(--orange);">
+          <div class="feat-icon" style="background:rgba(255,214,10,.13);">🥗</div>
+          <h3 data-i18n="f4_title">Smart Nutrition</h3>
+          <p data-i18n="f4_desc">AI-personalised meal plans that align with your fitness goals. Eat with purpose, fuel with precision.</p>
+          <span class="feat-link text-yellow" onclick="navigate('subscriptions')" data-i18n="f4_link">Ultra plan →</span>
+        </div>
+        <div class="feat-card reveal-scale" style="--accent-a:var(--purple);--accent-b:var(--cyan);">
+          <div class="feat-icon" style="background:rgba(191,90,242,.13);">📊</div>
+          <h3 data-i18n="f5_title">Track Progress</h3>
+          <p data-i18n="f5_desc">Advanced analytics show every improvement — strength curves, endurance trends, body measurements and more.</p>
+          <span class="feat-link text-purple" onclick="navigate('subscriptions')" data-i18n="f5_link">Explore analytics →</span>
+        </div>
+        <div class="feat-card reveal-scale reveal-delay-1" style="--accent-a:var(--orange);--accent-b:var(--pink);">
+          <div class="feat-icon" style="background:rgba(255,107,53,.13);">🤝</div>
+          <h3 data-i18n="f6_title">Community Power</h3>
+          <p data-i18n="f6_desc">Connect with thousands of members, join challenges, share wins, and celebrate milestones together.</p>
+          <span class="feat-link text-orange" onclick="navigate('about')" data-i18n="f6_link">Join the community →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRIP 1 -->
+  <section class="strip">
+    <div class="strip-inner">
+      <div class="strip-visual strip-slide-left">
+        <div class="mockup-phone">
+          <div class="mockup-screen">
+            <div class="mock-header"><span>9:41</span><span>▶▶</span></div>
+            <div class="mock-title" data-i18n="mock_summary">Summary</div>
+            <svg viewBox="0 0 160 160" width="130" style="margin:0 auto 16px;display:block">
+              <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,45,120,.18)" stroke-width="12"/>
+              <path fill="none" stroke="#FF2D78" stroke-width="12" stroke-linecap="round" d="M80,12 A68,68 0 1,1 79,12"/>
+              <circle cx="80" cy="80" r="50" fill="none" stroke="rgba(57,255,20,.18)" stroke-width="11"/>
+              <path fill="none" stroke="#39FF14" stroke-width="11" stroke-linecap="round" d="M80,30 A50,50 0 1,1 79.5,30"/>
+              <circle cx="80" cy="80" r="34" fill="none" stroke="rgba(0,229,255,.18)" stroke-width="10"/>
+              <path fill="none" stroke="#00E5FF" stroke-width="10" stroke-linecap="round" d="M80,46 A34,34 0 0,1 114,80"/>
+            </svg>
+            <div class="mock-card"><div class="mock-dot" style="background:#FF2D78"></div><div><div class="mock-label">Move</div><div class="mock-val" style="color:#FF2D78">398/630 CAL</div></div></div>
+            <div class="mock-card"><div class="mock-dot" style="background:#39FF14"></div><div><div class="mock-label">Exercise</div><div class="mock-val" style="color:#39FF14">29/30 MIN</div></div></div>
+            <div class="mock-card"><div class="mock-dot" style="background:#00E5FF"></div><div><div class="mock-label">Stand</div><div class="mock-val" style="color:#00E5FF">13/12 HRS</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="strip-text strip-slide-right">
+        <span class="section-tag text-pink" data-i18n="strip1_tag">Move. Exercise. Stand.</span>
+        <h2 class="section-title" data-i18n="strip1_title">Close your rings.<br><span class="g-pink">Every single day.</span></h2>
+        <p data-i18n="strip1_p">The three activity rings keep you motivated throughout the day. Every step, every workout, every hour on your feet counts towards a healthier you.</p>
+        <button class="btn-primary" onclick="navigate('subscriptions')" data-i18n="strip1_cta">Start Tracking Today</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRIP 2 -->
+  <section class="strip" style="background:var(--bg2);">
+    <div class="strip-inner reverse">
+      <div class="strip-visual strip-slide-right" style="background:linear-gradient(135deg,rgba(57,255,20,.07),rgba(0,229,255,.07));">
+        <div style="text-align:center;padding:32px;">
+          <div style="font-size:3rem;margin-bottom:12px;">🏋️</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:8px;" class="g-green" data-i18n="mock_workout">Today's Workout</div>
+          <div style="color:var(--text2);font-size:.85rem;margin-bottom:24px;" data-i18n="mock_workout_sub">Upper Body Power · 45 min</div>
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:260px;margin:0 auto;">
+            <div style="background:var(--bg3);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.85rem;font-weight:500;" data-i18n="ex_bench">Bench Press</span><span style="color:var(--green);font-size:.8rem;font-weight:700;">4 × 8</span></div>
+            <div style="background:var(--bg3);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.85rem;font-weight:500;" data-i18n="ex_rows">Barbell Rows</span><span style="color:var(--cyan);font-size:.8rem;font-weight:700;">3 × 10</span></div>
+            <div style="background:var(--bg3);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.85rem;font-weight:500;" data-i18n="ex_ohp">Overhead Press</span><span style="color:var(--pink);font-size:.8rem;font-weight:700;">4 × 6</span></div>
+            <div style="background:var(--bg3);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.85rem;font-weight:500;" data-i18n="ex_pullup">Pull-ups</span><span style="color:var(--yellow);font-size:.8rem;font-weight:700;">3 × max</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="strip-text strip-slide-left">
+        <span class="section-tag text-green" data-i18n="strip2_tag">Personalised Workouts</span>
+        <h2 class="section-title" data-i18n="strip2_title">Your plan.<br><span class="g-green">Your pace.</span></h2>
+        <p data-i18n="strip2_p">Every workout is crafted to match your fitness level, goals, and schedule. Our AI adapts the plan as you grow.</p>
+        <button class="btn-primary" onclick="navigate('subscriptions')" data-i18n="strip2_cta">View Plans</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRIP 3 -->
+  <section class="strip">
+    <div class="strip-inner">
+      <div class="strip-visual strip-slide-left" style="background:linear-gradient(135deg,rgba(191,90,242,.07),rgba(0,229,255,.04));">
+        <div style="padding:28px;width:100%;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:16px;" data-i18n="mock_trends">Trends</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--green);font-size:.7rem;font-weight:700;" data-i18n="t_exercise">▲ Exercise</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">29 MIN/DAY</div></div>
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--cyan);font-size:.7rem;font-weight:700;" data-i18n="t_stand">▲ Stand</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">13 HR/DAY</div></div>
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--pink);font-size:.7rem;font-weight:700;" data-i18n="t_move">▼ Move</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">432 CAL/D</div></div>
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--purple);font-size:.7rem;font-weight:700;" data-i18n="t_cardio">— Cardio</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">48 VO2MAX</div></div>
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--yellow);font-size:.7rem;font-weight:700;" data-i18n="t_walk">▲ Walk Pace</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">14 MIN/MI</div></div>
+            <div style="background:var(--bg3);border-radius:12px;padding:12px;"><div style="color:var(--orange);font-size:.7rem;font-weight:700;" data-i18n="t_run">▲ Run Pace</div><div style="font-weight:700;font-size:.9rem;margin-top:2px;">8 MIN/MI</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="strip-text strip-slide-right">
+        <span class="section-tag text-purple" data-i18n="strip3_tag">Advanced Analytics</span>
+        <h2 class="section-title" data-i18n="strip3_title">See your progress.<br><span class="g-purple">Data that inspires.</span></h2>
+        <p data-i18n="strip3_p">Every metric you care about, visualised in real time. Spot trends, celebrate milestones, and always know where you stand.</p>
+        <button class="btn-primary" onclick="navigate('subscriptions')" data-i18n="strip3_cta">Unlock Analytics</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section style="padding:100px 24px;">
+    <div class="reveal" style="max-width:900px;margin:0 auto;background:linear-gradient(135deg,rgba(57,255,20,.1),rgba(0,229,255,.06));border:1px solid rgba(57,255,20,.18);border-radius:36px;padding:72px;text-align:center;">
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,3.2rem);letter-spacing:-1.5px;margin-bottom:16px;" data-i18n="cta_title">Ready to transform?</h2>
+      <p style="color:var(--text2);font-size:1.05rem;margin-bottom:38px;max-width:480px;margin-left:auto;margin-right:auto;" data-i18n="cta_p">Join 500,000+ people who chose Kelp to reach their fitness goals faster than ever before.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary"   onclick="navigate('subscriptions')" data-i18n="cta_btn1">See Pricing</button>
+        <button class="btn-secondary" onclick="navigate('contact')"       data-i18n="cta_btn2">Contact Us</button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /home -->
+
+<!-- ══════════════════ ABOUT PAGE ══════════════════ -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="section-tag text-green reveal" data-i18n="about_tag">Our Story</div>
+    <h1 class="reveal reveal-delay-1" data-i18n="about_h1">We believe fitness<br>should be <span class="g-green">personal.</span></h1>
+    <p class="reveal reveal-delay-2" data-i18n="about_p">Kelp was born from a simple idea: everyone deserves a coach in their pocket. We built the app we always wanted — one that truly adapts to you.</p>
+  </div>
+  <div class="section" style="padding-top:20px;">
+    <div class="about-grid reveal">
+      <div class="about-card"><div style="font-size:2rem;margin-bottom:14px;">🌊</div><h3 data-i18n="about_c1_title">Our Mission</h3><p data-i18n="about_c1_p">To make elite-level fitness coaching accessible to everyone, everywhere — using smart technology to personalise every rep, every meal, every milestone.</p></div>
+      <div class="about-card"><div style="font-size:2rem;margin-bottom:14px;">👁️</div><h3 data-i18n="about_c2_title">Our Vision</h3><p data-i18n="about_c2_p">A world where your fitness journey is as unique as you are. We're building the most intelligent, most human fitness platform on the planet.</p></div>
+    </div>
+    <div style="margin-top:60px;" class="reveal reveal-delay-1">
+      <h2 class="section-title" data-i18n="about_val_title">Our Values</h2>
+      <div class="about-values">
+        <div class="value-item"><div class="value-dot" style="background:var(--green)"></div><div><h4 data-i18n="val1_h">Consistency over perfection</h4><p data-i18n="val1_p">We build habits, not quick fixes. Every small step compounds into transformation.</p></div></div>
+        <div class="value-item"><div class="value-dot" style="background:var(--cyan)"></div><div><h4 data-i18n="val2_h">Science-backed everything</h4><p data-i18n="val2_p">Every programme, every meal plan, every recommendation is grounded in research.</p></div></div>
+        <div class="value-item"><div class="value-dot" style="background:var(--pink)"></div><div><h4 data-i18n="val3_h">Community first</h4><p data-i18n="val3_p">We're stronger together. Our community is our greatest feature.</p></div></div>
+        <div class="value-item"><div class="value-dot" style="background:var(--yellow)"></div><div><h4 data-i18n="val4_h">Radical transparency</h4><p data-i18n="val4_p">No hidden fees, no dark patterns, no vague claims.</p></div></div>
+      </div>
+    </div>
+    <div style="margin-top:80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px;" class="reveal">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;" class="g-green">2021</div><div style="color:var(--text2);font-size:.875rem;margin-top:6px;" data-i18n="ab_founded">Founded</div></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;" class="g-green">500K+</div><div style="color:var(--text2);font-size:.875rem;margin-top:6px;" data-i18n="ab_users">Users worldwide</div></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;" class="g-green">40+</div><div style="color:var(--text2);font-size:.875rem;margin-top:6px;" data-i18n="ab_countries">Countries</div></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;" class="g-green">150+</div><div style="color:var(--text2);font-size:.875rem;margin-top:6px;" data-i18n="ab_trainers">Expert Trainers</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TEAM PAGE ══════════════════ -->
+<div id="page-team" class="page">
+  <div class="section">
+    <div class="section-tag text-cyan reveal" data-i18n="team_tag">The Experts</div>
+    <h1 class="section-title reveal reveal-delay-1" data-i18n="team_h1">Meet the coaches<br>behind <span class="g-green">Kelp.</span></h1>
+    <p class="section-sub reveal reveal-delay-2" data-i18n="team_p">World-class athletes, certified trainers, and nutrition experts — all united by one goal: your results.</p>
+    <div class="team-grid">
+      <div class="team-card reveal-scale" style="border-color:rgba(57,255,20,.22);background:linear-gradient(145deg,rgba(57,255,20,.04),var(--card));">
+        <div style="position:absolute;top:14px;right:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;" data-i18n="head_coach">Head Coach</div>
+        <div class="team-avatar" style="--grad-a:var(--green);--grad-b:var(--cyan);background:rgba(57,255,20,.1);"><span style="font-size:2.2rem;">👨‍🏫</span></div>
+        <div class="team-name">Kacper Szymankiewicz</div>
+        <div class="team-role text-green" data-i18n="role_head">Head Coach & Co-Founder</div>
+        <div class="team-bio" data-i18n="kacper_bio">15+ years in elite strength & conditioning. Former national athletics coach. Kacper built Kelp's entire training philosophy from the ground up.</div>
+        <div class="team-tags"><span class="tag" data-i18n="tag_strength">Strength</span><span class="tag" data-i18n="tag_cond">S&C</span><span class="tag" data-i18n="tag_perf">Performance</span></div>
+      </div>
+      <div class="team-card reveal-scale reveal-delay-1" style="--grad-a:var(--pink);--grad-b:var(--orange);">
+        <div class="team-avatar" style="--grad-a:var(--pink);--grad-b:var(--orange);background:rgba(255,45,120,.1);"><span style="font-size:2.2rem;">👩‍⚕️</span></div>
+        <div class="team-name">Sofia Marchetti</div>
+        <div class="team-role text-pink" data-i18n="role_nutri">Head Nutritionist</div>
+        <div class="team-bio" data-i18n="sofia_bio">Sports dietitian & certified nutritionist from Milan. Sofia designs all personalised meal plans and oversees Kelp's nutrition science.</div>
+        <div class="team-tags"><span class="tag" data-i18n="tag_nutri">Nutrition</span><span class="tag" data-i18n="tag_diet">Dietetics</span><span class="tag" data-i18n="tag_sports">Sports Science</span></div>
+      </div>
+      <div class="team-card reveal-scale reveal-delay-2" style="--grad-a:var(--cyan);--grad-b:var(--purple);">
+        <div class="team-avatar" style="--grad-a:var(--cyan);--grad-b:var(--purple);background:rgba(0,229,255,.1);"><span style="font-size:2.2rem;">🏊</span></div>
+        <div class="team-name">Marcus Reid</div>
+        <div class="team-role text-cyan" data-i18n="role_endur">Endurance & Cardio Coach</div>
+        <div class="team-bio" data-i18n="marcus_bio">Ex-professional triathlete and IRONMAN finisher. Marcus specialises in endurance training and VO2 max optimisation.</div>
+        <div class="team-tags"><span class="tag" data-i18n="tag_endur">Endurance</span><span class="tag" data-i18n="tag_tri">Triathlon</span><span class="tag" data-i18n="tag_cardio">Cardio</span></div>
+      </div>
+      <div class="team-card reveal-scale reveal-delay-3" style="--grad-a:var(--yellow);--grad-b:var(--orange);">
+        <div class="team-avatar" style="--grad-a:var(--yellow);--grad-b:var(--orange);background:rgba(255,214,10,.1);"><span style="font-size:2.2rem;">🧘</span></div>
+        <div class="team-name">Yuki Tanaka</div>
+        <div class="team-role text-yellow" data-i18n="role_mob">Mobility & Recovery Coach</div>
+        <div class="team-bio" data-i18n="yuki_bio">Certified yoga instructor and physical therapist. Yuki designed Kelp's recovery protocols and mobility programmes.</div>
+        <div class="team-tags"><span class="tag" data-i18n="tag_mob">Mobility</span><span class="tag" data-i18n="tag_yoga">Yoga</span><span class="tag" data-i18n="tag_rec">Recovery</span></div>
+      </div>
+      <div class="team-card reveal-scale" style="--grad-a:var(--purple);--grad-b:var(--pink);">
+        <div class="team-avatar" style="--grad-a:var(--purple);--grad-b:var(--pink);background:rgba(191,90,242,.1);"><span style="font-size:2.2rem;">💻</span></div>
+        <div class="team-name">André Costa</div>
+        <div class="team-role text-purple" data-i18n="role_ai">AI & Performance Analyst</div>
+        <div class="team-bio" data-i18n="andre_bio">Data scientist and sports analyst. André built the algorithms that power Kelp's adaptive training system.</div>
+        <div class="team-tags"><span class="tag">AI</span><span class="tag" data-i18n="tag_data">Data Science</span><span class="tag" data-i18n="tag_anal">Analytics</span></div>
+      </div>
+      <div class="team-card reveal-scale reveal-delay-1" style="--grad-a:var(--orange);--grad-b:var(--yellow);">
+        <div class="team-avatar" style="--grad-a:var(--orange);--grad-b:var(--yellow);background:rgba(255,107,53,.1);"><span style="font-size:2.2rem;">🏆</span></div>
+        <div class="team-name">Amara Osei</div>
+        <div class="team-role text-orange" data-i18n="role_hiit">HIIT & Functional Coach</div>
+        <div class="team-bio" data-i18n="amara_bio">World-class functional fitness coach and former CrossFit competitor. Amara's workouts are legendary for results and intensity.</div>
+        <div class="team-tags"><span class="tag">HIIT</span><span class="tag">CrossFit</span><span class="tag" data-i18n="tag_func">Functional</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SUBSCRIPTIONS PAGE ══════════════════ -->
+<div id="page-subscriptions" class="page">
+  <div class="section">
+    <div class="section-tag text-green reveal" data-i18n="plans_tag">Pricing</div>
+    <h1 class="section-title reveal reveal-delay-1" data-i18n="plans_h1">Choose your<br><span class="g-green">Kelp plan.</span></h1>
+    <p class="section-sub reveal reveal-delay-2" data-i18n="plans_p">Start free, upgrade anytime. All plans come with a 7-day free trial — no credit card needed.</p>
+    <div class="plans-grid">
+      <div class="plan-card reveal-scale">
+        <div class="plan-name" data-i18n="base_name">Base</div>
+        <div class="plan-sub"  data-i18n="base_sub">Everything to get started</div>
+        <div class="plan-price">$9<span>.99</span></div>
+        <div class="plan-period" data-i18n="per_month">per month</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="yes" data-i18n="base_f1">Access to 75% of all workouts</li>
+          <li class="yes" data-i18n="base_f2">Zero ads, ever</li>
+          <li class="yes" data-i18n="base_f3">Basic goal tracking</li>
+          <li class="yes" data-i18n="base_f4">Community feed access</li>
+          <li class="yes" data-i18n="base_f5">Weekly training reminders</li>
+        </ul>
+        <button class="plan-btn outline" data-i18n="btn_choose">Choose Base</button>
+      </div>
+      <div class="plan-card featured reveal-scale reveal-delay-1">
+        <div class="plan-badge" data-i18n="most_popular">Most Popular</div>
+        <div class="plan-name" data-i18n="pro_name">Pro</div>
+        <div class="plan-sub"  data-i18n="pro_sub">For the dedicated athlete</div>
+        <div class="plan-price" style="background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$19<span style="-webkit-text-fill-color:var(--text2);">.99</span></div>
+        <div class="plan-period" data-i18n="per_month">per month</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="yes" data-i18n="pro_f1">Everything in Base</li>
+          <li class="yes" data-i18n="pro_f2">Personalised weekly training plans</li>
+          <li class="yes" data-i18n="pro_f3">Advanced progress analytics</li>
+          <li class="yes" data-i18n="pro_f4">Access to 100% of all workouts</li>
+        </ul>
+        <button class="plan-btn primary" data-i18n="btn_choose_pro">Choose Pro</button>
+      </div>
+      <div class="plan-card reveal-scale reveal-delay-2" style="border-color:rgba(191,90,242,.28);--plan-glow:rgba(191,90,242,.08);">
+        <div class="plan-badge" style="background:linear-gradient(135deg,var(--purple),var(--pink));" data-i18n="ultra_badge">Ultra Exclusive</div>
+        <div class="plan-name" data-i18n="ultra_name">Ultra</div>
+        <div class="plan-sub"  data-i18n="ultra_sub">The complete transformation</div>
+        <div class="plan-price" style="background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$39<span style="-webkit-text-fill-color:var(--text2);">.99</span></div>
+        <div class="plan-period" data-i18n="per_month">per month</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="yes" data-i18n="ultra_f1">Everything in Base & Pro</li>
+          <li class="yes" data-i18n="ultra_f2">Personalised AI diet planning</li>
+          <li class="yes" data-i18n="ultra_f3">Early access to new workouts</li>
+          <li class="yes" data-i18n="ultra_f4">Exclusive Ultra Challenges</li>
+          <li class="yes" data-i18n="ultra_f5">Priority 24/7 support</li>
+        </ul>
+        <button class="plan-btn primary" style="background:linear-gradient(135deg,var(--purple),var(--pink));" data-i18n="btn_choose_ultra">Go Ultra</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;color:var(--text3);font-size:.85rem;" data-i18n="plans_note">All plans include a 7-day free trial. Cancel anytime. Prices in USD.</div>
+    <div style="margin-top:80px;" class="reveal">
+      <h2 class="section-title" style="font-size:1.8rem;margin-bottom:32px;" data-i18n="compare_title">Compare all features</h2>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:12px 16px;text-align:left;color:var(--text2);font-weight:500;" data-i18n="feat_col">Feature</th>
+              <th style="padding:12px 16px;text-align:center;font-family:'Syne',sans-serif;font-weight:700;" data-i18n="base_name">Base</th>
+              <th style="padding:12px 16px;text-align:center;font-family:'Syne',sans-serif;font-weight:700;color:var(--green);" data-i18n="pro_name">Pro</th>
+              <th style="padding:12px 16px;text-align:center;font-family:'Syne',sans-serif;font-weight:700;color:var(--purple);" data-i18n="ultra_name">Ultra</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ CONTACT PAGE ══════════════════ -->
+<div id="page-contact" class="page">
+  <div class="contact-wrap">
+    <div class="section-tag text-cyan reveal" data-i18n="contact_tag">Get in Touch</div>
+    <h1 class="reveal reveal-delay-1" data-i18n="contact_h1">We'd love to<br><span class="g-green">hear from you.</span></h1>
+    <p class="reveal reveal-delay-2" data-i18n="contact_p">Have a question, want to become a trainer, or just want to say hi? Drop us a message.</p>
+    <form class="contact-form reveal" onsubmit="submitContact(event)">
+      <div class="form-row">
+        <div class="form-group"><label data-i18n="form_fname">First Name</label><input type="text" data-i18n-placeholder="ph_fname" placeholder="John" required></div>
+        <div class="form-group"><label data-i18n="form_lname">Last Name</label><input type="text" data-i18n-placeholder="ph_lname" placeholder="Doe" required></div>
+      </div>
+      <div class="form-group"><label data-i18n="form_email">Email</label><input type="email" data-i18n-placeholder="ph_email" placeholder="john@example.com" required></div>
+      <div class="form-group">
+        <label data-i18n="form_subject">Subject</label>
+        <select>
+          <option data-i18n="sub_general">General Inquiry</option>
+          <option data-i18n="sub_support">Technical Support</option>
+          <option data-i18n="sub_trainer">Become a Trainer</option>
+          <option data-i18n="sub_press">Press & Media</option>
+          <option data-i18n="sub_partner">Partnership</option>
+        </select>
+      </div>
+      <div class="form-group"><label data-i18n="form_msg">Message</label><textarea data-i18n-placeholder="ph_msg" placeholder="Write your message here..."></textarea></div>
+      <button type="submit" class="btn-primary" style="align-self:flex-start;padding:13px 38px;" data-i18n="form_send">Send Message</button>
+    </form>
+    <div class="contact-info reveal">
+      <div class="info-card"><div class="info-icon">📧</div><h4 data-i18n="ci_email">Email</h4><p>hello@kelpfit.com</p></div>
+      <div class="info-card"><div class="info-icon">💬</div><h4 data-i18n="ci_chat">Live Chat</h4><p data-i18n="ci_chat_p">24/7 for Ultra users</p></div>
+      <div class="info-card"><div class="info-icon">📍</div><h4 data-i18n="ci_office">Office</h4><p>Warsaw, Poland 🇵🇱</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo" style="font-size:1.8rem;" onclick="navigate('home')">Kelp</div>
+        <p data-i18n="footer_brand_p">Train smarter, live stronger. Kelp is the all-in-one fitness platform for those who refuse to settle.</p>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_app">App</h5>
+        <a onclick="navigate('about')"         data-i18n="nav_about">About Us</a>
+        <a onclick="navigate('team')"          data-i18n="nav_team">Team</a>
+        <a onclick="navigate('subscriptions')" data-i18n="nav_plans">Pricing</a>
+        <a onclick="navigate('contact')"       data-i18n="nav_contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_support">Support</h5>
+        <a data-i18n="ft_faq">FAQ</a>
+        <a data-i18n="ft_privacy">Privacy Policy</a>
+        <a data-i18n="ft_terms">Terms of Service</a>
+        <a data-i18n="ft_cookies">Cookie Policy</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_follow">Follow Us</h5>
+        <a>Instagram</a><a>TikTok</a><a>YouTube</a><a>Twitter / X</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-i18n="footer_copy">© 2025 Kelp Fitness Inc. All rights reserved.</p>
+      <div class="footer-socials">
+        <a class="social-btn" title="Instagram">📸</a>
+        <a class="social-btn" title="TikTok">🎵</a>
+        <a class="social-btn" title="YouTube">▶</a>
+        <a class="social-btn" title="X">✕</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════ -->
+<script>
+// ──────────────────────────────────────────────────
+// TRANSLATIONS (full object — all 8 languages)
+// ──────────────────────────────────────────────────
+const T = {
+  en:{
+    nav_home:"Home",nav_about:"About",nav_team:"Team",nav_plans:"Plans",nav_contact:"Contact",
+    btn_login:"Log In",btn_start:"Start Now",lang_label:"Language",scroll_down:"Scroll",
+    hero_tag:"🏆 #1 Fitness App 2025",hero_h1a:"Train smarter.",hero_h1b:"Live stronger.",
+    hero_p:"Kelp transforms your fitness journey with AI-powered workouts, real-time progress tracking, and a community that pushes you further every day.",
+    hero_cta1:"Get Started Free",hero_cta2:"Learn More",
+    stat1:"Active Users",stat2:"Workouts Done",stat3:"App Rating",stat4:"Expert Trainers",
+    feat_tag:"Why Kelp",feat_title:"Everything you need\nto reach your peak.",feat_sub:"Built for athletes, beginners, and everyone in between — Kelp has the tools to level you up.",
+    f1_title:"Build Strength",f1_desc:"Progressive overload programs designed by elite coaches. Lift heavier, recover smarter, grow consistently.",f1_link:"Meet our coaches →",
+    f2_title:"Boost Endurance",f2_desc:"Cardio & HIIT plans that push your limits week by week. Track your VO2 max and watch it climb.",f2_link:"See plans →",
+    f3_title:"Sculpt Your Body",f3_desc:"Body recomposition programs combining weight training, cardio, and nutrition guidance for visible results.",f3_link:"Start sculpting →",
+    f4_title:"Smart Nutrition",f4_desc:"AI-personalised meal plans that align with your fitness goals. Eat with purpose, fuel with precision.",f4_link:"Ultra plan →",
+    f5_title:"Track Progress",f5_desc:"Advanced analytics show every improvement — strength curves, endurance trends, body measurements and more.",f5_link:"Explore analytics →",
+    f6_title:"Community Power",f6_desc:"Connect with thousands of members, join challenges, share wins, and celebrate milestones together.",f6_link:"Join the community →",
+    mock_summary:"Summary",mock_workout:"Today's Workout",mock_workout_sub:"Upper Body Power · 45 min",
+    ex_bench:"Bench Press",ex_rows:"Barbell Rows",ex_ohp:"Overhead Press",ex_pullup:"Pull-ups",
+    mock_trends:"Trends",t_exercise:"▲ Exercise",t_stand:"▲ Stand",t_move:"▼ Move",t_cardio:"— Cardio",t_walk:"▲ Walk Pace",t_run:"▲ Run Pace",
+    strip1_tag:"Move. Exercise. Stand.",strip1_title:"Close your rings.\nEvery single day.",strip1_p:"The three activity rings keep you motivated throughout the day. Every step, every workout, every hour on your feet counts towards a healthier you.",strip1_cta:"Start Tracking Today",
+    strip2_tag:"Personalised Workouts",strip2_title:"Your plan.\nYour pace.",strip2_p:"Every workout is crafted to match your fitness level, goals, and schedule. Our AI adapts the plan as you grow.",strip2_cta:"View Plans",
+    strip3_tag:"Advanced Analytics",strip3_title:"See your progress.\nData that inspires.",strip3_p:"Every metric you care about, visualised in real time. Spot trends, celebrate milestones, and always know where you stand.",strip3_cta:"Unlock Analytics",
+    cta_title:"Ready to transform?",cta_p:"Join 500,000+ people who chose Kelp to reach their fitness goals faster than ever before.",cta_btn1:"See Pricing",cta_btn2:"Contact Us",
+    about_tag:"Our Story",about_h1:"We believe fitness\nshould be personal.",about_p:"Kelp was born from a simple idea: everyone deserves a coach in their pocket. We built the app we always wanted — one that truly adapts to you.",
+    about_c1_title:"Our Mission",about_c1_p:"To make elite-level fitness coaching accessible to everyone, everywhere — using smart technology to personalise every rep, every meal, every milestone.",
+    about_c2_title:"Our Vision",about_c2_p:"A world where your fitness journey is as unique as you are. We're building the most intelligent, most human fitness platform on the planet.",
+    about_val_title:"Our Values",
+    val1_h:"Consistency over perfection",val1_p:"We build habits, not quick fixes. Every small step compounds into transformation.",
+    val2_h:"Science-backed everything",val2_p:"Every programme, every meal plan, every recommendation is grounded in research.",
+    val3_h:"Community first",val3_p:"We're stronger together. Our community is our greatest feature.",
+    val4_h:"Radical transparency",val4_p:"No hidden fees, no dark patterns, no vague claims. We say what we do and do what we say.",
+    ab_founded:"Founded",ab_users:"Users worldwide",ab_countries:"Countries",ab_trainers:"Expert Trainers",
+    team_tag:"The Experts",team_h1:"Meet the coaches\nbehind Kelp.",team_p:"World-class athletes, certified trainers, and nutrition experts — all united by one goal: your results.",
+    head_coach:"Head Coach",role_head:"Head Coach & Co-Founder",kacper_bio:"15+ years in elite strength & conditioning. Former national athletics coach. Kacper built Kelp's entire training philosophy from the ground up.",
+    tag_strength:"Strength",tag_cond:"S&C",tag_perf:"Performance",
+    role_nutri:"Head Nutritionist",sofia_bio:"Sports dietitian & certified nutritionist from Milan. Sofia designs all personalised meal plans and oversees Kelp's nutrition science.",tag_nutri:"Nutrition",tag_diet:"Dietetics",tag_sports:"Sports Science",
+    role_endur:"Endurance & Cardio Coach",marcus_bio:"Ex-professional triathlete and IRONMAN finisher. Marcus specialises in endurance training and VO2 max optimisation.",tag_endur:"Endurance",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Mobility & Recovery Coach",yuki_bio:"Certified yoga instructor and physical therapist. Yuki designed Kelp's recovery protocols and mobility programmes.",tag_mob:"Mobility",tag_yoga:"Yoga",tag_rec:"Recovery",
+    role_ai:"AI & Performance Analyst",andre_bio:"Data scientist and sports analyst. André built the algorithms that power Kelp's adaptive training system.",tag_data:"Data Science",tag_anal:"Analytics",
+    role_hiit:"HIIT & Functional Coach",amara_bio:"World-class functional fitness coach and former CrossFit competitor. Amara's workouts are legendary for results and intensity.",tag_func:"Functional",
+    plans_tag:"Pricing",plans_h1:"Choose your\nKelp plan.",plans_p:"Start free, upgrade anytime. All plans come with a 7-day free trial — no credit card needed.",
+    base_name:"Base",base_sub:"Everything to get started",per_month:"per month",
+    base_f1:"Access to 75% of all workouts",base_f2:"Zero ads, ever",base_f3:"Basic goal tracking",base_f4:"Community feed access",base_f5:"Weekly training reminders",
+    pro_name:"Pro",pro_sub:"For the dedicated athlete",most_popular:"Most Popular",
+    pro_f1:"Everything in Base",pro_f2:"Personalised weekly training plans",pro_f3:"Advanced progress analytics",pro_f4:"Access to 100% of all workouts",
+    ultra_name:"Ultra",ultra_sub:"The complete transformation",ultra_badge:"Ultra Exclusive",
+    ultra_f1:"Everything in Base & Pro",ultra_f2:"Personalised AI diet planning",ultra_f3:"Early access to new workouts",ultra_f4:"Exclusive Ultra Challenges",ultra_f5:"Priority 24/7 support",
+    btn_choose:"Choose Base",btn_choose_pro:"Choose Pro",btn_choose_ultra:"Go Ultra",
+    plans_note:"All plans include a 7-day free trial. Cancel anytime. Prices in USD.",
+    compare_title:"Compare all features",feat_col:"Feature",
+    contact_tag:"Get in Touch",contact_h1:"We'd love to\nhear from you.",contact_p:"Have a question, want to become a trainer, or just want to say hi? Drop us a message.",
+    form_fname:"First Name",form_lname:"Last Name",form_email:"Email",form_subject:"Subject",form_msg:"Message",form_send:"Send Message",
+    ph_fname:"John",ph_lname:"Doe",ph_email:"john@example.com",ph_msg:"Write your message here...",
+    sub_general:"General Inquiry",sub_support:"Technical Support",sub_trainer:"Become a Trainer",sub_press:"Press & Media",sub_partner:"Partnership",
+    ci_email:"Email",ci_chat:"Live Chat",ci_chat_p:"24/7 for Ultra users",ci_office:"Office",
+    footer_brand_p:"Train smarter, live stronger. Kelp is the all-in-one fitness platform for those who refuse to settle.",footer_app:"App",footer_support:"Support",footer_follow:"Follow Us",
+    ft_faq:"FAQ",ft_privacy:"Privacy Policy",ft_terms:"Terms of Service",ft_cookies:"Cookie Policy",
+    footer_copy:"© 2025 Kelp Fitness Inc. All rights reserved.",
+  },
+  fr:{
+    nav_home:"Accueil",nav_about:"À propos",nav_team:"Équipe",nav_plans:"Abonnements",nav_contact:"Contact",
+    btn_login:"Connexion",btn_start:"Commencer",lang_label:"Langue",scroll_down:"Défiler",
+    hero_tag:"🏆 App Fitness N°1 2025",hero_h1a:"Entraîne-toi mieux.",hero_h1b:"Vis plus fort.",
+    hero_p:"Kelp transforme votre parcours fitness avec des entraînements alimentés par l'IA, un suivi en temps réel et une communauté motivante.",
+    hero_cta1:"Commencer gratuitement",hero_cta2:"En savoir plus",
+    stat1:"Utilisateurs actifs",stat2:"Séances réalisées",stat3:"Note de l'app",stat4:"Coachs experts",
+    feat_tag:"Pourquoi Kelp",feat_title:"Tout ce qu'il vous faut\npour atteindre votre sommet.",feat_sub:"Conçu pour les athlètes, les débutants et tout le monde entre les deux.",
+    f1_title:"Construire la force",f1_desc:"Programmes de surcharge progressive conçus par des coachs d'élite.",f1_link:"Rencontrer nos coachs →",
+    f2_title:"Améliorer l'endurance",f2_desc:"Plans cardio & HIIT qui repoussent vos limites semaine après semaine.",f2_link:"Voir les plans →",
+    f3_title:"Sculpter votre corps",f3_desc:"Programmes de recomposition corporelle combinant musculation, cardio et nutrition.",f3_link:"Commencer →",
+    f4_title:"Nutrition intelligente",f4_desc:"Plans de repas personnalisés par IA alignés sur vos objectifs.",f4_link:"Plan Ultra →",
+    f5_title:"Suivre les progrès",f5_desc:"Des analyses avancées montrent chaque amélioration.",f5_link:"Explorer →",
+    f6_title:"Force communautaire",f6_desc:"Rejoignez des milliers de membres, participez à des défis.",f6_link:"Rejoindre →",
+    mock_summary:"Résumé",mock_workout:"Séance du jour",mock_workout_sub:"Haut du corps · 45 min",
+    ex_bench:"Développé couché",ex_rows:"Rowing barre",ex_ohp:"Développé militaire",ex_pullup:"Tractions",
+    mock_trends:"Tendances",t_exercise:"▲ Exercice",t_stand:"▲ Debout",t_move:"▼ Mouvement",t_cardio:"— Cardio",t_walk:"▲ Marche",t_run:"▲ Course",
+    strip1_tag:"Bouger. S'exercer. Se lever.",strip1_title:"Fermez vos anneaux.\nChaque jour.",strip1_p:"Les trois anneaux d'activité vous motivent toute la journée.",strip1_cta:"Commencer aujourd'hui",
+    strip2_tag:"Entraînements personnalisés",strip2_title:"Votre plan.\nVotre rythme.",strip2_p:"Chaque séance est conçue pour correspondre à votre niveau et vos objectifs.",strip2_cta:"Voir les plans",
+    strip3_tag:"Analyses avancées",strip3_title:"Voyez vos progrès.\nDes données qui inspirent.",strip3_p:"Chaque métrique visualisée en temps réel.",strip3_cta:"Débloquer les analyses",
+    cta_title:"Prêt à vous transformer ?",cta_p:"Rejoignez 500 000+ personnes qui ont choisi Kelp.",cta_btn1:"Voir les tarifs",cta_btn2:"Nous contacter",
+    about_tag:"Notre histoire",about_h1:"Nous croyons que le fitness\ndoit être personnel.",about_p:"Kelp est né d'une idée simple : tout le monde mérite un coach dans sa poche.",
+    about_c1_title:"Notre mission",about_c1_p:"Rendre le coaching fitness d'élite accessible à tous, partout.",
+    about_c2_title:"Notre vision",about_c2_p:"Un monde où votre parcours fitness est aussi unique que vous.",
+    about_val_title:"Nos valeurs",val1_h:"La constance avant la perfection",val1_p:"Nous créons des habitudes, pas des solutions rapides.",
+    val2_h:"Tout fondé sur la science",val2_p:"Chaque programme est ancré dans la recherche.",
+    val3_h:"La communauté d'abord",val3_p:"Nous sommes plus forts ensemble.",
+    val4_h:"Transparence radicale",val4_p:"Pas de frais cachés, pas de pratiques obscures.",
+    ab_founded:"Fondée",ab_users:"Utilisateurs mondiaux",ab_countries:"Pays",ab_trainers:"Coachs experts",
+    team_tag:"Les experts",team_h1:"Rencontrez les coachs\nderrière Kelp.",team_p:"Athlètes de classe mondiale, entraîneurs certifiés et experts en nutrition.",
+    head_coach:"Coach principal",role_head:"Coach principal & Co-fondateur",kacper_bio:"15+ ans en préparation physique d'élite. Ancien coach d'athlétisme national.",
+    tag_strength:"Force",tag_cond:"Préparation",tag_perf:"Performance",
+    role_nutri:"Nutritionniste en chef",sofia_bio:"Diététicienne sportive de Milan.",tag_nutri:"Nutrition",tag_diet:"Diététique",tag_sports:"Science du sport",
+    role_endur:"Coach endurance & cardio",marcus_bio:"Ex-triathlète professionnel et finisher IRONMAN.",tag_endur:"Endurance",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Coach mobilité & récupération",yuki_bio:"Instructrice de yoga certifiée et kinésithérapeute.",tag_mob:"Mobilité",tag_yoga:"Yoga",tag_rec:"Récupération",
+    role_ai:"Analyste IA & performance",andre_bio:"Data scientist qui a créé les algorithmes adaptatifs de Kelp.",tag_data:"Science des données",tag_anal:"Analytique",
+    role_hiit:"Coach HIIT & fonctionnel",amara_bio:"Coach de fitness fonctionnel et ancienne compétitrice CrossFit.",tag_func:"Fonctionnel",
+    plans_tag:"Tarifs",plans_h1:"Choisissez votre\nplan Kelp.",plans_p:"Commencez gratuitement, mettez à niveau à tout moment. 7 jours d'essai inclus.",
+    base_name:"Base",base_sub:"Tout pour commencer",per_month:"par mois",
+    base_f1:"Accès à 75% des séances",base_f2:"Zéro publicité",base_f3:"Suivi des objectifs basique",base_f4:"Accès au fil communautaire",base_f5:"Rappels d'entraînement hebdomadaires",
+    pro_name:"Pro",pro_sub:"Pour l'athlète dévoué",most_popular:"Le plus populaire",
+    pro_f1:"Tout dans Base",pro_f2:"Plans d'entraînement hebdomadaires personnalisés",pro_f3:"Analyses de progrès avancées",pro_f4:"Accès à 100% des séances",
+    ultra_name:"Ultra",ultra_sub:"La transformation complète",ultra_badge:"Ultra Exclusif",
+    ultra_f1:"Tout dans Base & Pro",ultra_f2:"Plans alimentaires IA personnalisés",ultra_f3:"Accès anticipé aux nouvelles séances",ultra_f4:"Défis Ultra exclusifs",ultra_f5:"Support prioritaire 24/7",
+    btn_choose:"Choisir Base",btn_choose_pro:"Choisir Pro",btn_choose_ultra:"Passer Ultra",
+    plans_note:"Tous les plans incluent 7 jours d'essai gratuit. Annulez à tout moment.",
+    compare_title:"Comparer toutes les fonctionnalités",feat_col:"Fonctionnalité",
+    contact_tag:"Contactez-nous",contact_h1:"Nous serions ravis\nde vous entendre.",contact_p:"Vous avez une question ou souhaitez devenir coach ?",
+    form_fname:"Prénom",form_lname:"Nom",form_email:"Email",form_subject:"Sujet",form_msg:"Message",form_send:"Envoyer",
+    ph_fname:"Jean",ph_lname:"Dupont",ph_email:"jean@exemple.com",ph_msg:"Écrivez votre message ici...",
+    sub_general:"Renseignement général",sub_support:"Support technique",sub_trainer:"Devenir coach",sub_press:"Presse & médias",sub_partner:"Partenariat",
+    ci_email:"Email",ci_chat:"Chat en direct",ci_chat_p:"24/7 pour les utilisateurs Ultra",ci_office:"Bureau",
+    footer_brand_p:"Entraînez-vous mieux, vivez plus fort.",footer_app:"Application",footer_support:"Support",footer_follow:"Suivez-nous",
+    ft_faq:"FAQ",ft_privacy:"Politique de confidentialité",ft_terms:"Conditions d'utilisation",ft_cookies:"Politique des cookies",
+    footer_copy:"© 2025 Kelp Fitness Inc. Tous droits réservés.",
+  },
+  es:{
+    nav_home:"Inicio",nav_about:"Nosotros",nav_team:"Equipo",nav_plans:"Planes",nav_contact:"Contacto",
+    btn_login:"Iniciar sesión",btn_start:"Empezar ahora",lang_label:"Idioma",scroll_down:"Deslizar",
+    hero_tag:"🏆 App de Fitness #1 2025",hero_h1a:"Entrena más inteligente.",hero_h1b:"Vive más fuerte.",
+    hero_p:"Kelp transforma tu viaje fitness con entrenamientos potenciados por IA, seguimiento en tiempo real y una comunidad que te impulsa cada día.",
+    hero_cta1:"Empieza gratis",hero_cta2:"Saber más",
+    stat1:"Usuarios activos",stat2:"Entrenamientos hechos",stat3:"Valoración de la app",stat4:"Entrenadores expertos",
+    feat_tag:"Por qué Kelp",feat_title:"Todo lo que necesitas\npara alcanzar tu cima.",feat_sub:"Diseñado para atletas, principiantes y todo el mundo.",
+    f1_title:"Ganar fuerza",f1_desc:"Programas de sobrecarga progresiva diseñados por entrenadores de élite.",f1_link:"Conoce nuestros entrenadores →",
+    f2_title:"Mejorar resistencia",f2_desc:"Planes de cardio e HIIT que superan tus límites semana a semana.",f2_link:"Ver planes →",
+    f3_title:"Esculpir tu cuerpo",f3_desc:"Programas de recomposición corporal que combinan pesas, cardio y nutrición.",f3_link:"Empieza →",
+    f4_title:"Nutrición inteligente",f4_desc:"Planes de comida personalizados por IA alineados con tus objetivos.",f4_link:"Plan Ultra →",
+    f5_title:"Seguir el progreso",f5_desc:"Análisis avanzados que muestran cada mejora.",f5_link:"Explorar →",
+    f6_title:"Poder comunitario",f6_desc:"Conéctate con miles de miembros, únete a retos.",f6_link:"Unirse →",
+    mock_summary:"Resumen",mock_workout:"Entrenamiento de hoy",mock_workout_sub:"Tren superior · 45 min",
+    ex_bench:"Press de banca",ex_rows:"Remo con barra",ex_ohp:"Press militar",ex_pullup:"Dominadas",
+    mock_trends:"Tendencias",t_exercise:"▲ Ejercicio",t_stand:"▲ De pie",t_move:"▼ Movimiento",t_cardio:"— Cardio",t_walk:"▲ Marcha",t_run:"▲ Carrera",
+    strip1_tag:"Mover. Ejercitar. Pararse.",strip1_title:"Cierra tus anillos.\nCada día.",strip1_p:"Los tres anillos de actividad te mantienen motivado durante todo el día.",strip1_cta:"Empieza hoy",
+    strip2_tag:"Entrenamientos personalizados",strip2_title:"Tu plan.\nTu ritmo.",strip2_p:"Cada entrenamiento está diseñado para adaptarse a tu nivel y objetivos.",strip2_cta:"Ver planes",
+    strip3_tag:"Análisis avanzados",strip3_title:"Ve tu progreso.\nDatos que inspiran.",strip3_p:"Cada métrica visualizada en tiempo real.",strip3_cta:"Desbloquear análisis",
+    cta_title:"¿Listo para transformarte?",cta_p:"Únete a 500.000+ personas que eligieron Kelp.",cta_btn1:"Ver precios",cta_btn2:"Contáctanos",
+    about_tag:"Nuestra historia",about_h1:"Creemos que el fitness\ndebe ser personal.",about_p:"Kelp nació de una idea simple: todos merecen un entrenador en su bolsillo.",
+    about_c1_title:"Nuestra misión",about_c1_p:"Hacer que el coaching fitness de élite sea accesible para todos.",
+    about_c2_title:"Nuestra visión",about_c2_p:"Un mundo donde tu viaje fitness es tan único como tú.",
+    about_val_title:"Nuestros valores",val1_h:"Constancia sobre perfección",val1_p:"Creamos hábitos, no soluciones rápidas.",
+    val2_h:"Todo respaldado por la ciencia",val2_p:"Cada programa está fundamentado en investigación.",
+    val3_h:"La comunidad primero",val3_p:"Somos más fuertes juntos.",
+    val4_h:"Transparencia radical",val4_p:"Sin tarifas ocultas, sin trucos.",
+    ab_founded:"Fundada",ab_users:"Usuarios mundiales",ab_countries:"Países",ab_trainers:"Entrenadores expertos",
+    team_tag:"Los expertos",team_h1:"Conoce a los entrenadores\ndetrás de Kelp.",team_p:"Atletas de clase mundial, entrenadores certificados y expertos en nutrición.",
+    head_coach:"Entrenador principal",role_head:"Entrenador jefe & Co-fundador",kacper_bio:"15+ años en preparación física de élite.",
+    tag_strength:"Fuerza",tag_cond:"Preparación",tag_perf:"Rendimiento",
+    role_nutri:"Nutricionista jefa",sofia_bio:"Dietista deportiva de Milán.",tag_nutri:"Nutrición",tag_diet:"Dietética",tag_sports:"Ciencia del deporte",
+    role_endur:"Entrenador de resistencia",marcus_bio:"Ex triatleta profesional y finisher de IRONMAN.",tag_endur:"Resistencia",tag_tri:"Triatlón",tag_cardio:"Cardio",
+    role_mob:"Entrenador de movilidad",yuki_bio:"Instructora de yoga certificada y fisioterapeuta.",tag_mob:"Movilidad",tag_yoga:"Yoga",tag_rec:"Recuperación",
+    role_ai:"Analista IA y rendimiento",andre_bio:"Científico de datos que construyó los algoritmos adaptativos de Kelp.",tag_data:"Ciencia de datos",tag_anal:"Analítica",
+    role_hiit:"Entrenador HIIT",amara_bio:"Entrenadora de fitness funcional y ex competidora de CrossFit.",tag_func:"Funcional",
+    plans_tag:"Precios",plans_h1:"Elige tu\nplan Kelp.",plans_p:"Empieza gratis, mejora cuando quieras. 7 días de prueba incluidos.",
+    base_name:"Base",base_sub:"Todo para empezar",per_month:"por mes",
+    base_f1:"Acceso al 75% de los entrenamientos",base_f2:"Cero anuncios",base_f3:"Seguimiento básico de objetivos",base_f4:"Acceso al feed comunitario",base_f5:"Recordatorios semanales",
+    pro_name:"Pro",pro_sub:"Para el atleta dedicado",most_popular:"Más popular",
+    pro_f1:"Todo en Base",pro_f2:"Planes de entrenamiento semanales personalizados",pro_f3:"Análisis avanzados de progreso",pro_f4:"Acceso al 100% de entrenamientos",
+    ultra_name:"Ultra",ultra_sub:"La transformación completa",ultra_badge:"Ultra Exclusivo",
+    ultra_f1:"Todo en Base y Pro",ultra_f2:"Planes de dieta IA personalizados",ultra_f3:"Acceso anticipado a nuevos entrenamientos",ultra_f4:"Retos Ultra exclusivos",ultra_f5:"Soporte prioritario 24/7",
+    btn_choose:"Elegir Base",btn_choose_pro:"Elegir Pro",btn_choose_ultra:"Ir Ultra",
+    plans_note:"Todos los planes incluyen 7 días de prueba gratis. Cancela cuando quieras.",
+    compare_title:"Comparar todas las funciones",feat_col:"Función",
+    contact_tag:"Contáctanos",contact_h1:"Nos encantaría\nescucharte.",contact_p:"¿Tienes una pregunta o quieres ser entrenador?",
+    form_fname:"Nombre",form_lname:"Apellido",form_email:"Correo",form_subject:"Asunto",form_msg:"Mensaje",form_send:"Enviar mensaje",
+    ph_fname:"Juan",ph_lname:"García",ph_email:"juan@ejemplo.com",ph_msg:"Escribe tu mensaje aquí...",
+    sub_general:"Consulta general",sub_support:"Soporte técnico",sub_trainer:"Ser entrenador",sub_press:"Prensa y medios",sub_partner:"Asociación",
+    ci_email:"Correo",ci_chat:"Chat en vivo",ci_chat_p:"24/7 para usuarios Ultra",ci_office:"Oficina",
+    footer_brand_p:"Entrena más inteligente, vive más fuerte.",footer_app:"App",footer_support:"Soporte",footer_follow:"Síguenos",
+    ft_faq:"FAQ",ft_privacy:"Política de privacidad",ft_terms:"Términos de servicio",ft_cookies:"Política de cookies",
+    footer_copy:"© 2025 Kelp Fitness Inc. Todos los derechos reservados.",
+  },
+  it:{
+    nav_home:"Home",nav_about:"Chi siamo",nav_team:"Team",nav_plans:"Piani",nav_contact:"Contatti",
+    btn_login:"Accedi",btn_start:"Inizia ora",lang_label:"Lingua",scroll_down:"Scorri",
+    hero_tag:"🏆 App Fitness #1 2025",hero_h1a:"Allenati meglio.",hero_h1b:"Vivi più forte.",
+    hero_p:"Kelp trasforma il tuo percorso fitness con allenamenti basati sull'IA.",
+    hero_cta1:"Inizia gratis",hero_cta2:"Scopri di più",
+    stat1:"Utenti attivi",stat2:"Allenamenti completati",stat3:"Valutazione app",stat4:"Trainer esperti",
+    feat_tag:"Perché Kelp",feat_title:"Tutto ciò di cui hai bisogno\nper raggiungere il tuo picco.",feat_sub:"Pensato per atleti, principianti e chiunque nel mezzo.",
+    f1_title:"Costruire forza",f1_desc:"Programmi di sovraccarico progressivo progettati da trainer d'élite.",f1_link:"Conosci i nostri coach →",
+    f2_title:"Migliorare la resistenza",f2_desc:"Piani cardio e HIIT che spingono i tuoi limiti.",f2_link:"Vedi i piani →",
+    f3_title:"Scolpire il corpo",f3_desc:"Programmi di ricomposizione corporea.",f3_link:"Inizia →",
+    f4_title:"Nutrizione intelligente",f4_desc:"Piani alimentari personalizzati dall'IA.",f4_link:"Piano Ultra →",
+    f5_title:"Monitorare i progressi",f5_desc:"Analisi avanzate mostrano ogni miglioramento.",f5_link:"Esplora →",
+    f6_title:"Forza della community",f6_desc:"Connettiti con migliaia di membri.",f6_link:"Unisciti →",
+    mock_summary:"Riepilogo",mock_workout:"Allenamento di oggi",mock_workout_sub:"Parte superiore · 45 min",
+    ex_bench:"Panca piana",ex_rows:"Rematore bilanciere",ex_ohp:"Lento avanti",ex_pullup:"Trazioni",
+    mock_trends:"Tendenze",t_exercise:"▲ Esercizio",t_stand:"▲ In piedi",t_move:"▼ Movimento",t_cardio:"— Cardio",t_walk:"▲ Camminata",t_run:"▲ Corsa",
+    strip1_tag:"Muoviti. Allenati. Stai in piedi.",strip1_title:"Chiudi i tuoi anelli.\nOgni singolo giorno.",strip1_p:"I tre anelli di attività ti mantengono motivato durante tutta la giornata.",strip1_cta:"Inizia a monitorare oggi",
+    strip2_tag:"Allenamenti personalizzati",strip2_title:"Il tuo piano.\nIl tuo ritmo.",strip2_p:"Ogni allenamento è progettato per corrispondere al tuo livello.",strip2_cta:"Vedi i piani",
+    strip3_tag:"Analisi avanzate",strip3_title:"Vedi i tuoi progressi.\nDati che ispirano.",strip3_p:"Ogni metrica visualizzata in tempo reale.",strip3_cta:"Sblocca le analisi",
+    cta_title:"Pronto a trasformarti?",cta_p:"Unisciti a 500.000+ persone che hanno scelto Kelp.",cta_btn1:"Vedi i prezzi",cta_btn2:"Contattaci",
+    about_tag:"La nostra storia",about_h1:"Crediamo che il fitness\ndebba essere personale.",about_p:"Kelp è nato da una semplice idea: tutti meritano un coach in tasca.",
+    about_c1_title:"La nostra missione",about_c1_p:"Rendere il coaching fitness d'élite accessibile a tutti.",
+    about_c2_title:"La nostra visione",about_c2_p:"Un mondo dove il tuo percorso fitness è unico come te.",
+    about_val_title:"I nostri valori",val1_h:"Costanza prima della perfezione",val1_p:"Costruiamo abitudini, non soluzioni rapide.",
+    val2_h:"Tutto basato sulla scienza",val2_p:"Ogni programma è fondato sulla ricerca.",
+    val3_h:"La community al primo posto",val3_p:"Siamo più forti insieme.",
+    val4_h:"Trasparenza radicale",val4_p:"Nessuna spesa nascosta.",
+    ab_founded:"Fondata",ab_users:"Utenti nel mondo",ab_countries:"Paesi",ab_trainers:"Trainer esperti",
+    team_tag:"Gli esperti",team_h1:"Incontra i coach\ndietro Kelp.",team_p:"Atleti di livello mondiale, trainer certificati ed esperti di nutrizione.",
+    head_coach:"Head Coach",role_head:"Head Coach & Co-Fondatore",kacper_bio:"15+ anni in preparazione atletica d'élite.",
+    tag_strength:"Forza",tag_cond:"Prep. fisica",tag_perf:"Performance",
+    role_nutri:"Nutrizionista capo",sofia_bio:"Dietista sportiva di Milano.",tag_nutri:"Nutrizione",tag_diet:"Dietetica",tag_sports:"Scienza dello sport",
+    role_endur:"Coach resistenza e cardio",marcus_bio:"Ex triatleta professionista e finisher IRONMAN.",tag_endur:"Resistenza",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Coach mobilità e recupero",yuki_bio:"Istruttrice di yoga certificata e fisioterapista.",tag_mob:"Mobilità",tag_yoga:"Yoga",tag_rec:"Recupero",
+    role_ai:"Analista IA e performance",andre_bio:"Data scientist che ha costruito gli algoritmi adattativi di Kelp.",tag_data:"Data science",tag_anal:"Analitiche",
+    role_hiit:"Coach HIIT e funzionale",amara_bio:"Coach di fitness funzionale ed ex atleta CrossFit.",tag_func:"Funzionale",
+    plans_tag:"Prezzi",plans_h1:"Scegli il tuo\npiano Kelp.",plans_p:"Inizia gratis, aggiorna in qualsiasi momento. 7 giorni di prova inclusi.",
+    base_name:"Base",base_sub:"Tutto per iniziare",per_month:"al mese",
+    base_f1:"Accesso al 75% degli allenamenti",base_f2:"Zero pubblicità",base_f3:"Monitoraggio base degli obiettivi",base_f4:"Accesso al feed della community",base_f5:"Promemoria settimanali",
+    pro_name:"Pro",pro_sub:"Per l'atleta dedicato",most_popular:"Più popolare",
+    pro_f1:"Tutto in Base",pro_f2:"Piani di allenamento settimanali personalizzati",pro_f3:"Analisi avanzate dei progressi",pro_f4:"Accesso al 100% degli allenamenti",
+    ultra_name:"Ultra",ultra_sub:"La trasformazione completa",ultra_badge:"Ultra Esclusivo",
+    ultra_f1:"Tutto in Base e Pro",ultra_f2:"Piani dietetici IA personalizzati",ultra_f3:"Accesso anticipato ai nuovi allenamenti",ultra_f4:"Sfide Ultra esclusive",ultra_f5:"Supporto prioritario 24/7",
+    btn_choose:"Scegli Base",btn_choose_pro:"Scegli Pro",btn_choose_ultra:"Vai Ultra",
+    plans_note:"Tutti i piani includono 7 giorni di prova gratuita. Cancella quando vuoi.",
+    compare_title:"Confronta tutte le funzionalità",feat_col:"Funzionalità",
+    contact_tag:"Contattaci",contact_h1:"Saremmo felici\ndi sentirti.",contact_p:"Hai una domanda o vuoi diventare un trainer?",
+    form_fname:"Nome",form_lname:"Cognome",form_email:"Email",form_subject:"Oggetto",form_msg:"Messaggio",form_send:"Invia messaggio",
+    ph_fname:"Marco",ph_lname:"Rossi",ph_email:"marco@esempio.com",ph_msg:"Scrivi il tuo messaggio qui...",
+    sub_general:"Richiesta generale",sub_support:"Supporto tecnico",sub_trainer:"Diventare trainer",sub_press:"Stampa e media",sub_partner:"Partnership",
+    ci_email:"Email",ci_chat:"Chat dal vivo",ci_chat_p:"24/7 per gli utenti Ultra",ci_office:"Ufficio",
+    footer_brand_p:"Allenati meglio, vivi più forte.",footer_app:"App",footer_support:"Supporto",footer_follow:"Seguici",
+    ft_faq:"FAQ",ft_privacy:"Privacy Policy",ft_terms:"Termini di servizio",ft_cookies:"Cookie Policy",
+    footer_copy:"© 2025 Kelp Fitness Inc. Tutti i diritti riservati.",
+  },
+  de:{
+    nav_home:"Start",nav_about:"Über uns",nav_team:"Team",nav_plans:"Pläne",nav_contact:"Kontakt",
+    btn_login:"Anmelden",btn_start:"Jetzt starten",lang_label:"Sprache",scroll_down:"Scrollen",
+    hero_tag:"🏆 Fitness-App Nr. 1 2025",hero_h1a:"Trainiere smarter.",hero_h1b:"Lebe stärker.",
+    hero_p:"Kelp verändert deine Fitnessreise mit KI-gestützten Workouts, Echtzeit-Tracking und einer Gemeinschaft.",
+    hero_cta1:"Kostenlos starten",hero_cta2:"Mehr erfahren",
+    stat1:"Aktive Nutzer",stat2:"Abgeschlossene Workouts",stat3:"App-Bewertung",stat4:"Experten-Trainer",
+    feat_tag:"Warum Kelp",feat_title:"Alles, was du brauchst,\num dein Bestes zu erreichen.",feat_sub:"Gebaut für Athleten, Anfänger und alle dazwischen.",
+    f1_title:"Kraft aufbauen",f1_desc:"Progressive Überlastungsprogramme von Elite-Coaches.",f1_link:"Unsere Coaches treffen →",
+    f2_title:"Ausdauer steigern",f2_desc:"Cardio- und HIIT-Pläne, die deine Grenzen verschieben.",f2_link:"Pläne ansehen →",
+    f3_title:"Körper formen",f3_desc:"Körperneukompositionsprogramme aus Krafttraining, Cardio und Ernährung.",f3_link:"Jetzt formen →",
+    f4_title:"Smarte Ernährung",f4_desc:"KI-personalisierte Ernährungspläne für deine Ziele.",f4_link:"Ultra-Plan →",
+    f5_title:"Fortschritt verfolgen",f5_desc:"Fortschrittliche Analysen zeigen jede Verbesserung.",f5_link:"Analysen erkunden →",
+    f6_title:"Gemeinschaftskraft",f6_desc:"Verbinde dich mit tausenden Mitgliedern.",f6_link:"Gemeinschaft beitreten →",
+    mock_summary:"Zusammenfassung",mock_workout:"Heutiges Training",mock_workout_sub:"Oberkörper · 45 Min.",
+    ex_bench:"Bankdrücken",ex_rows:"Rudern mit Langhantel",ex_ohp:"Schulterdrücken",ex_pullup:"Klimmzüge",
+    mock_trends:"Trends",t_exercise:"▲ Training",t_stand:"▲ Stehen",t_move:"▼ Bewegung",t_cardio:"— Cardio",t_walk:"▲ Gehtempo",t_run:"▲ Lauftempo",
+    strip1_tag:"Bewegen. Trainieren. Stehen.",strip1_title:"Schließe deine Ringe.\nJeden einzelnen Tag.",strip1_p:"Die drei Aktivitätsringe halten dich den ganzen Tag motiviert.",strip1_cta:"Heute starten",
+    strip2_tag:"Personalisierte Workouts",strip2_title:"Dein Plan.\nDein Tempo.",strip2_p:"Jedes Workout ist auf dein Fitnesslevel und deine Ziele zugeschnitten.",strip2_cta:"Pläne ansehen",
+    strip3_tag:"Erweiterte Analysen",strip3_title:"Sieh deinen Fortschritt.\nDaten, die inspirieren.",strip3_p:"Jede wichtige Metrik in Echtzeit visualisiert.",strip3_cta:"Analysen freischalten",
+    cta_title:"Bereit zur Transformation?",cta_p:"Schließe dich 500.000+ Menschen an, die Kelp gewählt haben.",cta_btn1:"Preise ansehen",cta_btn2:"Kontaktiere uns",
+    about_tag:"Unsere Geschichte",about_h1:"Wir glauben, dass Fitness\npersönlich sein sollte.",about_p:"Kelp entstand aus einer einfachen Idee: Jeder verdient einen Coach in der Tasche.",
+    about_c1_title:"Unsere Mission",about_c1_p:"Elite-Fitness-Coaching für alle zugänglich zu machen.",
+    about_c2_title:"Unsere Vision",about_c2_p:"Eine Welt, in der deine Fitnessreise so einzigartig ist wie du.",
+    about_val_title:"Unsere Werte",val1_h:"Beständigkeit vor Perfektion",val1_p:"Wir bauen Gewohnheiten, keine schnellen Lösungen.",
+    val2_h:"Wissenschaftlich fundiert",val2_p:"Jedes Programm basiert auf Forschung.",
+    val3_h:"Gemeinschaft zuerst",val3_p:"Wir sind gemeinsam stärker.",
+    val4_h:"Radikale Transparenz",val4_p:"Keine versteckten Gebühren.",
+    ab_founded:"Gegründet",ab_users:"Nutzer weltweit",ab_countries:"Länder",ab_trainers:"Experten-Trainer",
+    team_tag:"Die Experten",team_h1:"Triff die Coaches\nhinter Kelp.",team_p:"Weltklasse-Athleten, zertifizierte Trainer und Ernährungsexperten.",
+    head_coach:"Cheftrainer",role_head:"Cheftrainer & Mitgründer",kacper_bio:"15+ Jahre in der Elite-Kraft- und Konditionierung.",
+    tag_strength:"Kraft",tag_cond:"Kondition",tag_perf:"Performance",
+    role_nutri:"Chefernährungsberaterin",sofia_bio:"Sportdietologin aus Mailand.",tag_nutri:"Ernährung",tag_diet:"Diätetik",tag_sports:"Sportwissenschaft",
+    role_endur:"Ausdauer- und Cardio-Coach",marcus_bio:"Ex-Profi-Triathlet und IRONMAN-Finisher.",tag_endur:"Ausdauer",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Mobilitäts- und Erholungscoach",yuki_bio:"Zertifizierte Yoga-Lehrerin und Physiotherapeutin.",tag_mob:"Mobilität",tag_yoga:"Yoga",tag_rec:"Erholung",
+    role_ai:"KI- und Leistungsanalyst",andre_bio:"Datenwissenschaftler, der Kelps adaptive Trainingsalgorithmen entwickelt hat.",tag_data:"Data Science",tag_anal:"Analytik",
+    role_hiit:"HIIT- und Funktionstrainer",amara_bio:"Weltklasse-Funktionsfitness-Coach.",tag_func:"Funktional",
+    plans_tag:"Preise",plans_h1:"Wähle deinen\nKelp-Plan.",plans_p:"Starte kostenlos, upgrade jederzeit. 7 Tage Testphase.",
+    base_name:"Base",base_sub:"Alles zum Starten",per_month:"pro Monat",
+    base_f1:"Zugang zu 75% aller Workouts",base_f2:"Null Werbung",base_f3:"Grundlegendes Ziel-Tracking",base_f4:"Community-Feed-Zugang",base_f5:"Wöchentliche Trainingserinnerungen",
+    pro_name:"Pro",pro_sub:"Für den engagierten Athleten",most_popular:"Am beliebtesten",
+    pro_f1:"Alles aus Base",pro_f2:"Personalisierte Wochentrainingspläne",pro_f3:"Erweiterte Fortschrittsanalysen",pro_f4:"Zugang zu 100% aller Workouts",
+    ultra_name:"Ultra",ultra_sub:"Die komplette Transformation",ultra_badge:"Ultra Exklusiv",
+    ultra_f1:"Alles aus Base & Pro",ultra_f2:"Personalisierte KI-Diätpläne",ultra_f3:"Frühzeitiger Zugang zu neuen Workouts",ultra_f4:"Exklusive Ultra-Challenges",ultra_f5:"Prioritäts-Support 24/7",
+    btn_choose:"Base wählen",btn_choose_pro:"Pro wählen",btn_choose_ultra:"Ultra wählen",
+    plans_note:"Alle Pläne beinhalten eine 7-tägige kostenlose Testphase.",
+    compare_title:"Alle Funktionen vergleichen",feat_col:"Funktion",
+    contact_tag:"Kontakt",contact_h1:"Wir würden uns freuen,\nvon dir zu hören.",contact_p:"Hast du eine Frage oder möchtest Trainer werden?",
+    form_fname:"Vorname",form_lname:"Nachname",form_email:"E-Mail",form_subject:"Betreff",form_msg:"Nachricht",form_send:"Nachricht senden",
+    ph_fname:"Max",ph_lname:"Müller",ph_email:"max@beispiel.com",ph_msg:"Schreibe deine Nachricht hier...",
+    sub_general:"Allgemeine Anfrage",sub_support:"Technischer Support",sub_trainer:"Trainer werden",sub_press:"Presse & Medien",sub_partner:"Partnerschaft",
+    ci_email:"E-Mail",ci_chat:"Live-Chat",ci_chat_p:"24/7 für Ultra-Nutzer",ci_office:"Büro",
+    footer_brand_p:"Trainiere smarter, lebe stärker.",footer_app:"App",footer_support:"Support",footer_follow:"Folge uns",
+    ft_faq:"FAQ",ft_privacy:"Datenschutzerklärung",ft_terms:"Nutzungsbedingungen",ft_cookies:"Cookie-Richtlinie",
+    footer_copy:"© 2025 Kelp Fitness Inc. Alle Rechte vorbehalten.",
+  },
+  pl:{
+    nav_home:"Strona główna",nav_about:"O nas",nav_team:"Zespół",nav_plans:"Plany",nav_contact:"Kontakt",
+    btn_login:"Zaloguj się",btn_start:"Zacznij teraz",lang_label:"Język",scroll_down:"Przewiń",
+    hero_tag:"🏆 Aplikacja Fitness #1 2025",hero_h1a:"Trenuj mądrzej.",hero_h1b:"Żyj silniej.",
+    hero_p:"Kelp transformuje Twój fitness z treningami opartymi na AI, śledzeniem postępów w czasie rzeczywistym i społecznością, która pcha Cię do przodu każdego dnia.",
+    hero_cta1:"Zacznij bezpłatnie",hero_cta2:"Dowiedz się więcej",
+    stat1:"Aktywni użytkownicy",stat2:"Ukończone treningi",stat3:"Ocena aplikacji",stat4:"Ekspertów trenerów",
+    feat_tag:"Dlaczego Kelp",feat_title:"Wszystko, czego potrzebujesz,\naby osiągnąć szczyt.",feat_sub:"Stworzony dla sportowców, początkujących i wszystkich pomiędzy.",
+    f1_title:"Buduj siłę",f1_desc:"Programy progresywnego przeciążenia zaprojektowane przez trenerów elit.",f1_link:"Poznaj naszych trenerów →",
+    f2_title:"Zwiększ wytrzymałość",f2_desc:"Plany cardio i HIIT, które przesuwają Twoje granice.",f2_link:"Zobacz plany →",
+    f3_title:"Rzeźb sylwetkę",f3_desc:"Programy rekomposycji ciała łączące trening siłowy, cardio i odżywianie.",f3_link:"Zacznij rzeźbić →",
+    f4_title:"Mądre odżywianie",f4_desc:"Plany posiłków personalizowane przez AI zgodne z Twoimi celami.",f4_link:"Plan Ultra →",
+    f5_title:"Śledź postępy",f5_desc:"Zaawansowane analizy pokazują każdą poprawę.",f5_link:"Odkryj analitykę →",
+    f6_title:"Siła społeczności",f6_desc:"Połącz się z tysiącami członków, dołącz do wyzwań.",f6_link:"Dołącz do społeczności →",
+    mock_summary:"Podsumowanie",mock_workout:"Dzisiejszy trening",mock_workout_sub:"Górne partie · 45 min",
+    ex_bench:"Wyciskanie na ławce",ex_rows:"Wiosłowanie sztangą",ex_ohp:"Wyciskanie żołnierskie",ex_pullup:"Podciąganie",
+    mock_trends:"Trendy",t_exercise:"▲ Ćwiczenia",t_stand:"▲ Stanie",t_move:"▼ Ruch",t_cardio:"— Cardio",t_walk:"▲ Marsz",t_run:"▲ Bieg",
+    strip1_tag:"Rusz się. Ćwicz. Wstawaj.",strip1_title:"Zamknij swoje pierścienie.\nKażdego dnia.",strip1_p:"Trzy pierścienie aktywności motywują Cię przez cały dzień.",strip1_cta:"Zacznij śledzić dzisiaj",
+    strip2_tag:"Spersonalizowane treningi",strip2_title:"Twój plan.\nTwoje tempo.",strip2_p:"Każdy trening jest dopasowany do Twojego poziomu i celów.",strip2_cta:"Zobacz plany",
+    strip3_tag:"Zaawansowana analityka",strip3_title:"Zobacz swoje postępy.\nDane, które inspirują.",strip3_p:"Każda ważna metryka wizualizowana w czasie rzeczywistym.",strip3_cta:"Odblokuj analitykę",
+    cta_title:"Gotowy na transformację?",cta_p:"Dołącz do ponad 500 000 osób, które wybrały Kelp.",cta_btn1:"Zobacz ceny",cta_btn2:"Skontaktuj się",
+    about_tag:"Nasza historia",about_h1:"Wierzymy, że fitness\npowinien być osobisty.",about_p:"Kelp powstał z prostego pomysłu: każdy zasługuje na trenera w kieszeni.",
+    about_c1_title:"Nasza misja",about_c1_p:"Uczynić elitarny coaching fitness dostępnym dla wszystkich.",
+    about_c2_title:"Nasza wizja",about_c2_p:"Świat, w którym Twoja podróż fitness jest tak unikalna jak Ty.",
+    about_val_title:"Nasze wartości",val1_h:"Konsekwencja ponad perfekcją",val1_p:"Budujemy nawyki, nie szybkie rozwiązania.",
+    val2_h:"Wszystko oparte na nauce",val2_p:"Każdy program jest ugruntowany w badaniach.",
+    val3_h:"Społeczność na pierwszym miejscu",val3_p:"Razem jesteśmy silniejsi.",
+    val4_h:"Radykalna przejrzystość",val4_p:"Żadnych ukrytych opłat.",
+    ab_founded:"Założona",ab_users:"Użytkownicy na świecie",ab_countries:"Kraje",ab_trainers:"Ekspertów trenerów",
+    team_tag:"Eksperci",team_h1:"Poznaj trenerów\nza Kelp.",team_p:"Sportowcy światowej klasy, certyfikowani trenerzy i eksperci od żywienia.",
+    head_coach:"Główny trener",role_head:"Główny trener i współzałożyciel",kacper_bio:"Ponad 15 lat w elitarnym przygotowaniu siłowym i kondycyjnym. Były narodowy trener lekkoatletyki.",
+    tag_strength:"Siła",tag_cond:"Kondycja",tag_perf:"Wydajność",
+    role_nutri:"Główna dietetyczka",sofia_bio:"Dietetyczka sportowa z Mediolanu.",tag_nutri:"Żywienie",tag_diet:"Dietetyka",tag_sports:"Nauka o sporcie",
+    role_endur:"Trener wytrzymałości i cardio",marcus_bio:"Były profesjonalny triathlonista i finalista IRONMAN.",tag_endur:"Wytrzymałość",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Trener mobilności i regeneracji",yuki_bio:"Certyfikowana instruktorka jogi i fizjoterapeutka.",tag_mob:"Mobilność",tag_yoga:"Joga",tag_rec:"Regeneracja",
+    role_ai:"Analityk AI i wydajności",andre_bio:"Naukowiec danych, który zbudował algorytmy adaptacyjne Kelp.",tag_data:"Data Science",tag_anal:"Analityka",
+    role_hiit:"Trener HIIT i funkcjonalny",amara_bio:"Trenerka fitness funkcjonalnego i była zawodniczka CrossFit.",tag_func:"Funkcjonalny",
+    plans_tag:"Cennik",plans_h1:"Wybierz swój\nplan Kelp.",plans_p:"Zacznij za darmo, ulepsz w dowolnym momencie. 7-dniowy bezpłatny okres próbny.",
+    base_name:"Base",base_sub:"Wszystko, aby zacząć",per_month:"miesięcznie",
+    base_f1:"Dostęp do 75% wszystkich treningów",base_f2:"Zero reklam",base_f3:"Podstawowe śledzenie celów",base_f4:"Dostęp do kanału społeczności",base_f5:"Cotygodniowe przypomnienia treningowe",
+    pro_name:"Pro",pro_sub:"Dla oddanego sportowca",most_popular:"Najpopularniejszy",
+    pro_f1:"Wszystko z Base",pro_f2:"Spersonalizowane tygodniowe plany treningowe",pro_f3:"Zaawansowana analiza postępów",pro_f4:"Dostęp do 100% wszystkich treningów",
+    ultra_name:"Ultra",ultra_sub:"Kompletna transformacja",ultra_badge:"Ultra Ekskluzywny",
+    ultra_f1:"Wszystko z Base i Pro",ultra_f2:"Spersonalizowane plany diety AI",ultra_f3:"Wczesny dostęp do nowych treningów",ultra_f4:"Ekskluzywne wyzwania Ultra",ultra_f5:"Priorytetowe wsparcie 24/7",
+    btn_choose:"Wybierz Base",btn_choose_pro:"Wybierz Pro",btn_choose_ultra:"Przejdź na Ultra",
+    plans_note:"Wszystkie plany zawierają 7-dniowy bezpłatny okres próbny. Anuluj w dowolnym momencie.",
+    compare_title:"Porównaj wszystkie funkcje",feat_col:"Funkcja",
+    contact_tag:"Skontaktuj się",contact_h1:"Chętnie\nCię wysłuchamy.",contact_p:"Masz pytanie lub chcesz zostać trenerem?",
+    form_fname:"Imię",form_lname:"Nazwisko",form_email:"Email",form_subject:"Temat",form_msg:"Wiadomość",form_send:"Wyślij wiadomość",
+    ph_fname:"Jan",ph_lname:"Kowalski",ph_email:"jan@przykład.com",ph_msg:"Napisz swoją wiadomość tutaj...",
+    sub_general:"Ogólne zapytanie",sub_support:"Wsparcie techniczne",sub_trainer:"Zostań trenerem",sub_press:"Prasa i media",sub_partner:"Partnerstwo",
+    ci_email:"Email",ci_chat:"Live Chat",ci_chat_p:"24/7 dla użytkowników Ultra",ci_office:"Biuro",
+    footer_brand_p:"Trenuj mądrzej, żyj silniej.",footer_app:"Aplikacja",footer_support:"Wsparcie",footer_follow:"Obserwuj nas",
+    ft_faq:"FAQ",ft_privacy:"Polityka prywatności",ft_terms:"Warunki użytkowania",ft_cookies:"Polityka cookies",
+    footer_copy:"© 2025 Kelp Fitness Inc. Wszelkie prawa zastrzeżone.",
+  },
+  pt:{
+    nav_home:"Início",nav_about:"Sobre nós",nav_team:"Equipe",nav_plans:"Planos",nav_contact:"Contato",
+    btn_login:"Entrar",btn_start:"Comece agora",lang_label:"Idioma",scroll_down:"Rolar",
+    hero_tag:"🏆 App de Fitness #1 2025",hero_h1a:"Treine mais inteligente.",hero_h1b:"Viva mais forte.",
+    hero_p:"Kelp transforma sua jornada fitness com treinos baseados em IA, rastreamento em tempo real e uma comunidade.",
+    hero_cta1:"Comece gratuitamente",hero_cta2:"Saiba mais",
+    stat1:"Usuários ativos",stat2:"Treinos concluídos",stat3:"Avaliação do app",stat4:"Treinadores especialistas",
+    feat_tag:"Por que Kelp",feat_title:"Tudo o que você precisa\npara alcançar seu pico.",feat_sub:"Feito para atletas, iniciantes e todos no meio.",
+    f1_title:"Construir força",f1_desc:"Programas de sobrecarga progressiva por treinadores de elite.",f1_link:"Conheça nossos treinadores →",
+    f2_title:"Aumentar resistência",f2_desc:"Planos de cardio e HIIT que superam seus limites.",f2_link:"Ver planos →",
+    f3_title:"Esculpir o corpo",f3_desc:"Programas de recomposição corporal.",f3_link:"Comece →",
+    f4_title:"Nutrição inteligente",f4_desc:"Planos de refeição personalizados por IA.",f4_link:"Plano Ultra →",
+    f5_title:"Rastrear progresso",f5_desc:"Análises avançadas mostram cada melhoria.",f5_link:"Explorar →",
+    f6_title:"Poder da comunidade",f6_desc:"Conecte-se com milhares de membros, participe de desafios.",f6_link:"Junte-se →",
+    mock_summary:"Resumo",mock_workout:"Treino de hoje",mock_workout_sub:"Parte superior · 45 min",
+    ex_bench:"Supino",ex_rows:"Remada com barra",ex_ohp:"Desenvolvimento",ex_pullup:"Barra fixa",
+    mock_trends:"Tendências",t_exercise:"▲ Exercício",t_stand:"▲ Em pé",t_move:"▼ Movimento",t_cardio:"— Cardio",t_walk:"▲ Caminhada",t_run:"▲ Corrida",
+    strip1_tag:"Mova-se. Exercite-se. Fique de pé.",strip1_title:"Feche seus anéis.\nTodos os dias.",strip1_p:"Os três anéis de atividade mantêm você motivado ao longo do dia.",strip1_cta:"Comece a rastrear hoje",
+    strip2_tag:"Treinos personalizados",strip2_title:"Seu plano.\nSeu ritmo.",strip2_p:"Cada treino é elaborado para se adequar ao seu nível e objetivos.",strip2_cta:"Ver planos",
+    strip3_tag:"Análises avançadas",strip3_title:"Veja seu progresso.\nDados que inspiram.",strip3_p:"Cada métrica visualizada em tempo real.",strip3_cta:"Desbloquear análises",
+    cta_title:"Pronto para se transformar?",cta_p:"Junte-se a mais de 500.000 pessoas que escolheram Kelp.",cta_btn1:"Ver preços",cta_btn2:"Fale conosco",
+    about_tag:"Nossa história",about_h1:"Acreditamos que o fitness\ndeve ser pessoal.",about_p:"Kelp nasceu de uma ideia simples: todos merecem um treinador no bolso.",
+    about_c1_title:"Nossa missão",about_c1_p:"Tornar o coaching fitness de elite acessível a todos.",
+    about_c2_title:"Nossa visão",about_c2_p:"Um mundo onde sua jornada fitness é tão única quanto você.",
+    about_val_title:"Nossos valores",val1_h:"Consistência acima de perfeição",val1_p:"Construímos hábitos, não soluções rápidas.",
+    val2_h:"Tudo baseado em ciência",val2_p:"Cada programa é fundamentado em pesquisa.",
+    val3_h:"Comunidade em primeiro lugar",val3_p:"Somos mais fortes juntos.",
+    val4_h:"Transparência radical",val4_p:"Sem taxas ocultas, sem truques.",
+    ab_founded:"Fundada",ab_users:"Usuários no mundo",ab_countries:"Países",ab_trainers:"Treinadores especialistas",
+    team_tag:"Os especialistas",team_h1:"Conheça os treinadores\npor trás do Kelp.",team_p:"Atletas de classe mundial, treinadores certificados e especialistas em nutrição.",
+    head_coach:"Treinador principal",role_head:"Treinador chefe & Co-fundador",kacper_bio:"15+ anos em condicionamento físico de elite.",
+    tag_strength:"Força",tag_cond:"Condicionamento",tag_perf:"Performance",
+    role_nutri:"Nutricionista chefe",sofia_bio:"Nutricionista esportiva de Milão.",tag_nutri:"Nutrição",tag_diet:"Dietética",tag_sports:"Ciência do esporte",
+    role_endur:"Treinador de resistência",marcus_bio:"Ex-triatleta profissional e finisher do IRONMAN.",tag_endur:"Resistência",tag_tri:"Triathlon",tag_cardio:"Cardio",
+    role_mob:"Treinador de mobilidade",yuki_bio:"Instrutora de yoga certificada e fisioterapeuta.",tag_mob:"Mobilidade",tag_yoga:"Yoga",tag_rec:"Recuperação",
+    role_ai:"Analista de IA e performance",andre_bio:"Cientista de dados que construiu os algoritmos adaptativos do Kelp.",tag_data:"Ciência de dados",tag_anal:"Análises",
+    role_hiit:"Treinador de HIIT",amara_bio:"Treinadora de fitness funcional e ex-atleta de CrossFit.",tag_func:"Funcional",
+    plans_tag:"Preços",plans_h1:"Escolha seu\nplano Kelp.",plans_p:"Comece gratuitamente, faça upgrade a qualquer momento. 7 dias de teste grátis.",
+    base_name:"Base",base_sub:"Tudo para começar",per_month:"por mês",
+    base_f1:"Acesso a 75% de todos os treinos",base_f2:"Zero anúncios",base_f3:"Rastreamento básico de metas",base_f4:"Acesso ao feed da comunidade",base_f5:"Lembretes semanais de treino",
+    pro_name:"Pro",pro_sub:"Para o atleta dedicado",most_popular:"Mais popular",
+    pro_f1:"Tudo no Base",pro_f2:"Planos de treino semanais personalizados",pro_f3:"Análises avançadas de progresso",pro_f4:"Acesso a 100% dos treinos",
+    ultra_name:"Ultra",ultra_sub:"A transformação completa",ultra_badge:"Ultra Exclusivo",
+    ultra_f1:"Tudo no Base e Pro",ultra_f2:"Planos de dieta IA personalizados",ultra_f3:"Acesso antecipado a novos treinos",ultra_f4:"Desafios Ultra exclusivos",ultra_f5:"Suporte prioritário 24/7",
+    btn_choose:"Escolher Base",btn_choose_pro:"Escolher Pro",btn_choose_ultra:"Ir Ultra",
+    plans_note:"Todos os planos incluem 7 dias de teste grátis. Cancele a qualquer momento.",
+    compare_title:"Comparar todos os recursos",feat_col:"Recurso",
+    contact_tag:"Entre em contato",contact_h1:"Adoraríamos\nouvir você.",contact_p:"Tem uma pergunta ou quer se tornar treinador?",
+    form_fname:"Nome",form_lname:"Sobrenome",form_email:"Email",form_subject:"Assunto",form_msg:"Mensagem",form_send:"Enviar mensagem",
+    ph_fname:"João",ph_lname:"Silva",ph_email:"joao@exemplo.com",ph_msg:"Escreva sua mensagem aqui...",
+    sub_general:"Consulta geral",sub_support:"Suporte técnico",sub_trainer:"Tornar-se treinador",sub_press:"Imprensa e mídia",sub_partner:"Parceria",
+    ci_email:"Email",ci_chat:"Chat ao vivo",ci_chat_p:"24/7 para usuários Ultra",ci_office:"Escritório",
+    footer_brand_p:"Treine mais inteligente, viva mais forte.",footer_app:"Aplicativo",footer_support:"Suporte",footer_follow:"Siga-nos",
+    ft_faq:"FAQ",ft_privacy:"Política de privacidade",ft_terms:"Termos de serviço",ft_cookies:"Política de cookies",
+    footer_copy:"© 2025 Kelp Fitness Inc. Todos os direitos reservados.",
+  },
+  ar:{
+    nav_home:"الرئيسية",nav_about:"معلومات",nav_team:"الفريق",nav_plans:"الخطط",nav_contact:"اتصل بنا",
+    btn_login:"تسجيل الدخول",btn_start:"ابدأ الآن",lang_label:"اللغة",scroll_down:"مرر",
+    hero_tag:"🏆 تطبيق اللياقة رقم 1 لعام 2025",hero_h1a:"تدرّب بذكاء.",hero_h1b:"عش بقوة.",
+    hero_p:"يُحوّل Kelp رحلتك الرياضية بتمارين مدعومة بالذكاء الاصطناعي وتتبع فوري للتقدم.",
+    hero_cta1:"ابدأ مجاناً",hero_cta2:"اعرف المزيد",
+    stat1:"مستخدم نشط",stat2:"تمرين مكتمل",stat3:"تقييم التطبيق",stat4:"مدرب خبير",
+    feat_tag:"لماذا Kelp",feat_title:"كل ما تحتاجه\nللوصول إلى قمتك.",feat_sub:"مصمم للرياضيين والمبتدئين وكل من بينهم.",
+    f1_title:"بناء القوة",f1_desc:"برامج الحمل التدريجي المصممة من قِبل مدربين من النخبة.",f1_link:"قابل مدربينا ←",
+    f2_title:"تعزيز التحمل",f2_desc:"خطط كارديو وهيت تدفع حدودك.",f2_link:"اطّلع على الخطط ←",
+    f3_title:"نحت الجسم",f3_desc:"برامج إعادة تكوين الجسم.",f3_link:"ابدأ ←",
+    f4_title:"التغذية الذكية",f4_desc:"خطط وجبات مخصصة بالذكاء الاصطناعي.",f4_link:"خطة Ultra ←",
+    f5_title:"تتبع التقدم",f5_desc:"تحليلات متقدمة تُظهر كل تحسن.",f5_link:"استكشف ←",
+    f6_title:"قوة المجتمع",f6_desc:"تواصل مع آلاف الأعضاء وانضم إلى التحديات.",f6_link:"انضم ←",
+    mock_summary:"ملخص",mock_workout:"تمرين اليوم",mock_workout_sub:"الجزء العلوي · 45 دقيقة",
+    ex_bench:"الضغط على المقعد",ex_rows:"التجديف بالبار",ex_ohp:"الضغط العسكري",ex_pullup:"العقلة",
+    mock_trends:"الاتجاهات",t_exercise:"▲ تمرين",t_stand:"▲ الوقوف",t_move:"▼ الحركة",t_cardio:"— كارديو",t_walk:"▲ المشي",t_run:"▲ الجري",
+    strip1_tag:"تحرّك. تمرّن. قف.",strip1_title:"أغلق حلقاتك.\nكل يوم.",strip1_p:"الحلقات الثلاث للنشاط تبقيك متحفزاً طوال اليوم.",strip1_cta:"ابدأ التتبع اليوم",
+    strip2_tag:"تمارين مخصصة",strip2_title:"خطتك.\nإيقاعك.",strip2_p:"كل تمرين مصمم ليتناسب مع مستواك وأهدافك.",strip2_cta:"اطّلع على الخطط",
+    strip3_tag:"تحليلات متقدمة",strip3_title:"انظر إلى تقدمك.\nبيانات تُلهم.",strip3_p:"كل مؤشر مهم مرئي في الوقت الفعلي.",strip3_cta:"افتح التحليلات",
+    cta_title:"هل أنت مستعد للتحول؟",cta_p:"انضم إلى أكثر من 500,000 شخص اختاروا Kelp.",cta_btn1:"اطّلع على الأسعار",cta_btn2:"تواصل معنا",
+    about_tag:"قصتنا",about_h1:"نؤمن بأن اللياقة\nيجب أن تكون شخصية.",about_p:"وُلد Kelp من فكرة بسيطة: يستحق الجميع مدرباً في جيبهم.",
+    about_c1_title:"مهمتنا",about_c1_p:"جعل التدريب الرياضي الاحترافي في متناول الجميع.",
+    about_c2_title:"رؤيتنا",about_c2_p:"عالم تكون فيه رحلتك الرياضية فريدة مثلك تماماً.",
+    about_val_title:"قيمنا",val1_h:"الاتساق فوق الكمال",val1_p:"نبني عادات لا حلولاً سريعة.",
+    val2_h:"كل شيء مدعوم علمياً",val2_p:"كل برنامج مبني على أبحاث علمية.",
+    val3_h:"المجتمع أولاً",val3_p:"نحن أقوى معاً.",
+    val4_h:"شفافية تامة",val4_p:"لا رسوم خفية.",
+    ab_founded:"التأسيس",ab_users:"مستخدم حول العالم",ab_countries:"دولة",ab_trainers:"مدرب خبير",
+    team_tag:"الخبراء",team_h1:"تعرّف على المدربين\nخلف Kelp.",team_p:"رياضيون عالميون ومدربون معتمدون وخبراء تغذية.",
+    head_coach:"المدرب الرئيسي",role_head:"المدرب الرئيسي والمؤسس المشارك",kacper_bio:"أكثر من 15 عاماً في التحضير البدني النخبوي.",
+    tag_strength:"القوة",tag_cond:"التكييف",tag_perf:"الأداء",
+    role_nutri:"كبيرة أخصائيي التغذية",sofia_bio:"أخصائية تغذية رياضية من ميلانو.",tag_nutri:"التغذية",tag_diet:"الحمية",tag_sports:"علوم الرياضة",
+    role_endur:"مدرب التحمل والقلب",marcus_bio:"ثلاثي رياضي محترف سابق ومنهٍ لسباق IRONMAN.",tag_endur:"التحمل",tag_tri:"الترياتلون",tag_cardio:"كارديو",
+    role_mob:"مدرب المرونة والتعافي",yuki_bio:"مدربة يوغا معتمدة ومعالجة فيزيائية.",tag_mob:"المرونة",tag_yoga:"يوغا",tag_rec:"التعافي",
+    role_ai:"محلل الذكاء الاصطناعي والأداء",andre_bio:"عالم بيانات بنى خوارزميات التدريب التكيفي لـ Kelp.",tag_data:"علم البيانات",tag_anal:"التحليلات",
+    role_hiit:"مدرب هيت والتمارين الوظيفية",amara_bio:"مدربة لياقة بدنية وظيفية وبطلة CrossFit سابقة.",tag_func:"وظيفي",
+    plans_tag:"الأسعار",plans_h1:"اختر خطة\nKelp الخاصة بك.",plans_p:"ابدأ مجاناً وارقِّ في أي وقت. تجربة مجانية لمدة 7 أيام.",
+    base_name:"Base",base_sub:"كل ما تحتاجه للبدء",per_month:"شهرياً",
+    base_f1:"وصول لـ 75% من التمارين",base_f2:"لا إعلانات أبداً",base_f3:"تتبع أهداف أساسي",base_f4:"الوصول إلى تغذية المجتمع",base_f5:"تذكيرات تدريبية أسبوعية",
+    pro_name:"Pro",pro_sub:"للرياضي المتفاني",most_popular:"الأكثر شعبية",
+    pro_f1:"كل شيء في Base",pro_f2:"خطط تدريب أسبوعية مخصصة",pro_f3:"تحليلات تقدم متقدمة",pro_f4:"وصول لـ 100% من التمارين",
+    ultra_name:"Ultra",ultra_sub:"التحول الكامل",ultra_badge:"Ultra حصري",
+    ultra_f1:"كل شيء في Base وPro",ultra_f2:"خطط غذائية مخصصة بالذكاء الاصطناعي",ultra_f3:"وصول مبكر لتمارين جديدة",ultra_f4:"تحديات Ultra الحصرية",ultra_f5:"دعم أولوية 24/7",
+    btn_choose:"اختر Base",btn_choose_pro:"اختر Pro",btn_choose_ultra:"انتقل لـ Ultra",
+    plans_note:"جميع الخطط تشمل 7 أيام تجربة مجانية. إلغاء في أي وقت.",
+    compare_title:"قارن جميع الميزات",feat_col:"الميزة",
+    contact_tag:"تواصل معنا",contact_h1:"يسعدنا\nسماعك.",contact_p:"هل لديك سؤال أو تريد أن تصبح مدرباً؟",
+    form_fname:"الاسم",form_lname:"اللقب",form_email:"البريد الإلكتروني",form_subject:"الموضوع",form_msg:"الرسالة",form_send:"إرسال الرسالة",
+    ph_fname:"أحمد",ph_lname:"محمد",ph_email:"ahmed@example.com",ph_msg:"اكتب رسالتك هنا...",
+    sub_general:"استفسار عام",sub_support:"الدعم الفني",sub_trainer:"كن مدرباً",sub_press:"الصحافة والإعلام",sub_partner:"شراكة",
+    ci_email:"البريد",ci_chat:"دردشة مباشرة",ci_chat_p:"24/7 لمستخدمي Ultra",ci_office:"المكتب",
+    footer_brand_p:"تدرّب بذكاء، عش بقوة.",footer_app:"التطبيق",footer_support:"الدعم",footer_follow:"تابعنا",
+    ft_faq:"أسئلة شائعة",ft_privacy:"سياسة الخصوصية",ft_terms:"شروط الخدمة",ft_cookies:"سياسة الكوكيز",
+    footer_copy:"© 2025 Kelp Fitness Inc. جميع الحقوق محفوظة.",
+  }
+};
+
+const LANG_META = {
+  en:{code:'EN',dir:'ltr'}, fr:{code:'FR',dir:'ltr'}, es:{code:'ES',dir:'ltr'},
+  it:{code:'IT',dir:'ltr'}, de:{code:'DE',dir:'ltr'}, pl:{code:'PL',dir:'ltr'},
+  pt:{code:'PT',dir:'ltr'}, ar:{code:'AR',dir:'rtl'},
+};
+
+let currentLang = 'en';
+let currentPage = 'home';
+const PAGE_SLUGS    = {home:'',about:'about',team:'team',subscriptions:'subscriptions',contact:'contact'};
+const SLUG_TO_PAGE  = {'':"home",about:'about',team:'team',subscriptions:'subscriptions',contact:'contact'};
+
+// ── DRAWER ──────────────────────────────────────────
+function toggleDrawer(){
+  const d = document.getElementById('drawer');
+  const o = document.getElementById('drawerOverlay');
+  const t = document.getElementById('menuToggle');
+  const isOpen = d.classList.contains('open');
+  if(isOpen){ closeDrawer(); } else {
+    d.classList.add('open');
+    o.classList.add('open');
+    t.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('menuToggle').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── ROUTING ─────────────────────────────────────────
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if(el){
+    el.classList.add('active');
+    el.classList.remove('page-enter');
+    void el.offsetWidth; // reflow
+    el.classList.add('page-enter');
+    currentPage = page;
+  }
+  // update drawer active state
+  document.querySelectorAll('#drawerNav a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('data-page')===page);
+  });
+  const slug = PAGE_SLUGS[page]||page;
+  const path = slug ? `/${currentLang}/${slug}` : `/${currentLang}`;
+  history.pushState({page,lang:currentLang},'',path);
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(initReveal, 100);
+}
+
+function parseURL(){
+  const parts = location.pathname.replace(/^\/+|\/+$/g,'').split('/');
+  let lang='en', page='home';
+  if(parts[0] && T[parts[0]]){ lang=parts[0]; if(parts[1]) page=SLUG_TO_PAGE[parts[1]]||'home'; }
+  else if(parts[0] && SLUG_TO_PAGE[parts[0]]) page=SLUG_TO_PAGE[parts[0]];
+  return{lang,page};
+}
+window.addEventListener('popstate', e=>{
+  if(e.state){ setLang(e.state.lang||currentLang,false); showPage(e.state.page||'home'); }
+});
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if(el){ el.classList.add('active'); el.classList.add('page-enter'); currentPage=page; }
+  document.querySelectorAll('#drawerNav a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('data-page')===page);
+  });
+  setTimeout(initReveal,100);
+}
+
+// ── LANGUAGE ────────────────────────────────────────
+function setLang(lang, pushState=true){
+  if(!T[lang]) return;
+  currentLang = lang;
+  const meta = LANG_META[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = meta.dir;
+  // mark selected pill
+  document.querySelectorAll('.lang-pill').forEach((p,i)=>{
+    const ls=['en','fr','es','it','de','pl','pt','ar'];
+    p.classList.toggle('selected', ls[i]===lang);
+  });
+  applyTranslations();
+  if(pushState){
+    const slug = PAGE_SLUGS[currentPage]||currentPage;
+    const path = slug ? `/${lang}/${slug}` : `/${lang}`;
+    history.pushState({page:currentPage,lang},'',path);
+  }
+}
+function applyTranslations(){
+  const tr = T[currentLang];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(tr[key]!==undefined) el.textContent = tr[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(tr[key]!==undefined) el.placeholder = tr[key];
+  });
+  buildCompareTable();
+}
+
+// ── COMPARE TABLE ────────────────────────────────────
+function buildCompareTable(){
+  const tr = T[currentLang];
+  const rows = [
+    [tr.base_f1||'75% of workouts','✓','✓','✓'],
+    [tr.base_f2||'Zero ads','✓','✓','✓'],
+    [tr.base_f3||'Basic goal tracking','✓','✓','✓'],
+    [tr.base_f4||'Community feed','✓','✓','✓'],
+    [tr.base_f5||'Weekly reminders','✓','✓','✓'],
+    [tr.pro_f2||'Personalised weekly plans','–','✓','✓'],
+    [tr.pro_f3||'Advanced analytics','–','✓','✓'],
+    [tr.pro_f4||'100% workout access','–','✓','✓'],
+    [tr.ultra_f2||'AI diet planning','–','–','✓'],
+    [tr.ultra_f3||'Early access workouts','–','–','✓'],
+    [tr.ultra_f4||'Ultra Challenges','–','–','✓'],
+    [tr.ultra_f5||'Priority 24/7 support','–','–','✓'],
+  ];
+  const tbody = document.getElementById('compareBody');
+  if(!tbody) return;
+  tbody.innerHTML = rows.map((r,i)=>`
+    <tr style="border-bottom:1px solid var(--border);${i%2===0?'background:rgba(255,255,255,.02);':''}">
+      <td style="padding:12px 16px;color:var(--text2);">${r[0]}</td>
+      <td style="padding:12px 16px;text-align:center;color:${r[1]==='✓'?'var(--green)':'var(--text3)'};">${r[1]}</td>
+      <td style="padding:12px 16px;text-align:center;color:${r[2]==='✓'?'var(--green)':'var(--text3)'};">${r[2]}</td>
+      <td style="padding:12px 16px;text-align:center;color:${r[3]==='✓'?'var(--purple)':'var(--text3)'};">${r[3]}</td>
+    </tr>`).join('');
+}
+
+// ── CONTACT ──────────────────────────────────────────
+function submitContact(e){
+  e.preventDefault();
+  const btn = e.target.querySelector('[type=submit]');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Sent!';
+  btn.style.background = 'var(--green)';
+  setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; e.target.reset(); },3000);
+}
+
+// ── SCROLL REVEAL ────────────────────────────────────
+function initReveal(){
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:.1});
+  document.querySelectorAll('.reveal:not(.visible), .reveal-scale:not(.visible), .strip-slide-left:not(.visible), .strip-slide-right:not(.visible)').forEach(el=>obs.observe(el));
+}
+
+// ── HEADER SCROLL EFFECT ─────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('siteHeader').classList.toggle('scrolled', window.scrollY > 20);
+},{ passive:true });
+
+// ── PARALLAX HERO BG ─────────────────────────────────
+window.addEventListener('scroll',()=>{
+  const bg = document.getElementById('heroBg');
+  if(bg) bg.style.transform = `translateY(${window.scrollY * 0.35}px)`;
+},{ passive:true });
+
+// ── COUNTER ANIMATION ────────────────────────────────
+function animateCounters(){
+  document.querySelectorAll('[data-counter]').forEach(el=>{
+    const target    = parseFloat(el.getAttribute('data-counter'));
+    const suffix    = el.getAttribute('data-suffix')||'';
+    const decimals  = parseInt(el.getAttribute('data-decimals')||'0');
+    const duration  = 2000;
+    const start     = performance.now();
+    function tick(now){
+      const pct = Math.min((now-start)/duration,1);
+      const ease = 1 - Math.pow(1-pct,3);
+      const val  = target * ease;
+      el.textContent = val.toFixed(decimals) + suffix;
+      if(pct<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+// Trigger counter when stats section enters viewport
+const statsObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ animateCounters(); statsObs.disconnect(); }});
+},{threshold:.5});
+const statsEl = document.querySelector('.hero-stats');
+if(statsEl) statsObs.observe(statsEl);
+
+// ── CARD MOUSE GLOW ──────────────────────────────────
+document.addEventListener('mousemove', e=>{
+  document.querySelectorAll('.feat-card').forEach(card=>{
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width)  * 100;
+    const y = ((e.clientY - rect.top)  / rect.height) * 100;
+    card.style.setProperty('--mx', x+'%');
+    card.style.setProperty('--my', y+'%');
+  });
+});
+
+// ── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const {lang,page} = parseURL();
+  setLang(lang,false);
+  showPage(page);
+  buildCompareTable();
+  initReveal();
+});
+</script>
+</body>
+</html>
